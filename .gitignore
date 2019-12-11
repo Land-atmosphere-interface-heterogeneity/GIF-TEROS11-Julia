@@ -1,0 +1,6 @@
+# ignore input and output files
+Output/
+Input/
+
+# ignore token file
+Alexis_Token.txt
