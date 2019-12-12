@@ -71,3 +71,9 @@ anim = @animate for i = collect(175:48:m)
     plot!(legend = nothing)
 end
 gif(anim,"Output\\anim_5days_v3.gif",fps=2)
+
+
+# TO DO: add a subplot with timeseries of all 64 SWC + Precip bar on right axis
+
+# TO DO: add the created figure to the readme file on the organisation page, so that it is displayed on the main page. 
+# Make the script run automatically daily (or weekly), downloading the new data, and updating the figure. 
