@@ -72,12 +72,12 @@ anim = @animate for i = collect(175:48:m)
 end
 gif(anim,"Output\\anim_5days_v3.gif",fps=2)
 
-# Download met data 
+# Download met data
 url = "http://www.atmos.anl.gov/ANLMET/numeric/2019/nov19met.data"
 met_path = "Input\\MET TOWER\\nov19met.data"
 download(url,met_path)
 
-# Read met data 
+# Read met data
 col_name = [:DOM,:Month,:Year,:Time,:PSC,:WD60,:WS60,:WD_STD60,:T60,:WD10,:WS10,:WD_STD10,:T10,:DPT,:RH,:TD100,:Precip,:RS,:RN,:Pressure,:WatVapPress,:TS10,:TS100,:TS10F]
 metdata = CSV.read(met_path, delim=' ',header=col_name,ignorerepeated=true,datarow=1,footerskip=2)
 met_n = size(metdata,1)
@@ -94,7 +94,7 @@ for i = 1:met_n
         metdata_time_str[i] = string(metdata.Time[i])
     end
 end
-# Then, we can use day of month, month, year and time 
+# Then, we can use day of month, month, year and time
 Dtime_met = Array{DateTime}(undef,met_n)
 for i = 1:met_n
     Dtime_met[i] = DateTime(metdata.Year[i]+2000,metdata.Month[i],metdata.DOM[i],parse(Int64,metdata_time_str[i][1:2]),parse(Int64,metdata_time_str[i][3:4]))
@@ -104,4 +104,4 @@ end
 
 # TO DO: Make the script download new SWC data from Zentra (possibly calling Python).
 # TO DO: Make the script commit and push, which will update figure, automatically (possibly calling Git Bash).
-# TO DO: Make the script run automatically daily (or weekly). 
+# TO DO: Make the script run automatically daily (or weekly).
