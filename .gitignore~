@@ -2,5 +2,5 @@
 Output/
 Input/
 
-# ignore token file
-Alexis_Token.txt
+README.rst~
+.README.rst.un~

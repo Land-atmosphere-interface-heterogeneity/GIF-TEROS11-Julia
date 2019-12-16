@@ -1,6 +1,3 @@
 # ignore input and output files
 Output/
 Input/
-
-README.rst~
-.README.rst.un~
