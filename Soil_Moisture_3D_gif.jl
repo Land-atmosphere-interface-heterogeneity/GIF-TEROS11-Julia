@@ -72,8 +72,36 @@ anim = @animate for i = collect(175:48:m)
 end
 gif(anim,"Output\\anim_5days_v3.gif",fps=2)
 
+# Download met data 
+url = "http://www.atmos.anl.gov/ANLMET/numeric/2019/nov19met.data"
+met_path = "Input\\MET TOWER\\nov19met.data"
+download(url,met_path)
 
-# TO DO: add a subplot with timeseries of all 64 SWC + Precip bar on right axis
+# Read met data 
+col_name = [:DOM,:Month,:Year,:Time,:PSC,:WD60,:WS60,:WD_STD60,:T60,:WD10,:WS10,:WD_STD10,:T10,:DPT,:RH,:TD100,:Precip,:RS,:RN,:Pressure,:WatVapPress,:TS10,:TS100,:TS10F]
+metdata = CSV.read(met_path, delim=' ',header=col_name,ignorerepeated=true,datarow=1,footerskip=2)
+met_n = size(metdata,1)
 
-# TO DO: add the created figure to the readme file on the organisation page, so that it is displayed on the main page. 
-# Make the script run automatically daily (or weekly), downloading the new data, and updating the figure. 
+# Create a DateTime vector from metdata Month, Year and Time
+# First, need 4-digits Array for Time
+metdata_time_str = Array{String}(undef,met_n)
+for i = 1:met_n
+    if length(string(metdata.Time[i])) == 2 # if only 2 numbers
+        metdata_time_str[i] = "00$(metdata.Time[i])"
+    elseif length(string(metdata.Time[i])) == 3 # if only 3 numbers
+        metdata_time_str[i] = "0$(metdata.Time[i])"
+    elseif length(string(metdata.Time[i])) == 4 # 4 numbers
+        metdata_time_str[i] = string(metdata.Time[i])
+    end
+end
+# Then, we can use day of month, month, year and time 
+Dtime_met = Array{DateTime}(undef,met_n)
+for i = 1:met_n
+    Dtime_met[i] = DateTime(metdata.Year[i]+2000,metdata.Month[i],metdata.DOM[i],parse(Int64,metdata_time_str[i][1:2]),parse(Int64,metdata_time_str[i][3:4]))
+end
+
+# TO DO: add a subplot with timeseries of SWC (mean + std) + Precip bar on right axis
+
+# TO DO: Make the script download new SWC data from Zentra (possibly calling Python).
+# TO DO: Make the script commit and push, which will update figure, automatically (possibly calling Git Bash).
+# TO DO: Make the script run automatically daily (or weekly). 
