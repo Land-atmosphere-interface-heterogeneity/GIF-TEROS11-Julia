@@ -10,3 +10,5 @@ Sensor field of soil moisture
 
 |Animation|
 
+.. |Animation| image:: ./images/Animation.gif
+
