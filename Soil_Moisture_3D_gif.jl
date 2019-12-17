@@ -105,3 +105,4 @@ end
 # TO DO: Make the script download new SWC data from Zentra (possibly calling Python).
 # TO DO: Make the script commit and push, which will update figure, automatically (possibly calling Git Bash).
 # TO DO: Make the script run automatically daily (or weekly).
+# THIS IS A TEST
