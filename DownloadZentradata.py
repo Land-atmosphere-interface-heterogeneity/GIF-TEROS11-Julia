@@ -1,8 +1,7 @@
 from zentra.api import *
 from os import getenv
 
-token = ZentraToken(username=getenv("zentra_un"),
-                    password=getenv("zentra_pw"))
+token = ZentraToken(username=getenv("zentra_un"),password=getenv("zentra_pw"))
 
 token.token
 
