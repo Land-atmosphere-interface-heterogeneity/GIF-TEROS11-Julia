@@ -82,9 +82,18 @@ for i = 1:met_n
     Dtime_met[i] = DateTime(metdata.Year[i]+2000,metdata.Month[i],metdata.DOM[i],parse(Int64,metdata_time_str[i][1:2]),parse(Int64,metdata_time_str[i][3:4]))
 end
 
+# Integrate daily Precip
+Precip_d = Array{Float64}(undef,30)
+Dtime_met_d = Array{DateTime}(undef,30)
+for i = 1:30
+    use = findall(x -> Dates.day(x) == i && Dates.month(x) == 11,Dtime_met)
+    Precip_d[i] = sum(metdata.Precip[use])
+    Dtime_met_d[i] = DateTime(2019,11,i)
+end
+
 # Make gif, fps = 2
 anim = @animate for i = collect(25:48:m)
-    z = zcolor=SWC[i,:]
+    z = SWC[i,:]
     use = findall(!isnan,z) # all non NaN values in z
     scatter(x[use],y[use],color=:redsblues,markersize=10,zcolor=z[use],
     xlabel="x (m)",ylabel="y (m)",title=Dates.format(Dtime[i], "e, dd u yyyy HH:MM:SS"),
@@ -96,7 +105,13 @@ gif(anim,"Output\\anim_5days_v3.gif",fps=2)
 
 # TO DO: add a subplot with timeseries of SWC (mean + std) + Precip bar on right axis
 
-# TO DO: Make the script download new SWC data from Zentra (possibly calling Python).
-# TO DO: Make the script commit and push, which will update figure, automatically (possibly calling Git Bash).
 # TO DO: Make the script run automatically daily (or weekly).
-# THIS IS A TEST 2
+
+z = SWC[200,:]
+p1 = scatter(x,y,color=:redsblues,markersize=10,zcolor=z);
+p2 = bar(Dtime_met_d,Precip_d); # ,xlims=(Dates.value(Dtime[1]),Dates.value(Dtime[m])));
+l = @layout [a{0.8h}; b]
+plot(p1, p2, layout=l,size=(500,700))
+
+
+
