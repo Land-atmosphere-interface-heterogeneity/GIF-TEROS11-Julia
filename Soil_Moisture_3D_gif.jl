@@ -1,21 +1,24 @@
 # Create a 3D gif of SWC moisture in space, over time
 
+# Define current working directory
+cd("C:\\Users\\arenchon\\Documents\\GitHub\\GIF-TEROS11-Julia")
+
 # Used Packages
 using DataFrames; using CSV; using Dates; using Plots;
 
 # First part of this code is similar to Plot_input.jl
 Input_FN = readdir("Input\\TEROS\\")
-permute!(Input_FN,[1,4,5,6,7,8,9,10,11,2,3]) # need to reorder from 1 to 11
+permute!(Input_FN,[3,4,5,6,7,8,9,10,11,1,2]) # need to reorder from 1 to 11
 n = length(Input_FN) # this is the number of input files, useful later
 data = DataFrame[]
-col_name = [:DateTime,:SWC_1,:Ts_1,:SWC_2,:Ts_2,:SWC_3,:Ts_3,:SWC_4,:Ts_4,:SWC_5,:Ts_5,:SWC_6,:Ts_6,:Battery_P,:Battery_V,:Pressure,:Log_T]
+
 for i = 1:n
-    df = CSV.read(string("Input\\TEROS\\",Input_FN[i]),header=col_name,datarow=2,dateformat="yyyy-mm-dd HH:MM:SS")
+    df = CSV.read(string("Input\\TEROS\\",Input_FN[i]),dateformat="yyyy-mm-dd HH:MM:SS+00:00")
     push!(data, df) # push "Insert one or more items at the end of collection"
 end
 
 # Create a continuous half-hourly DateTime vector
-Dtime = collect(Dates.DateTime(DateTime(2019,11,19,00,00,00)):Dates.Minute(30):Dates.DateTime(DateTime(2019,12,08,00,00,00)))
+Dtime = collect(Dates.DateTime(DateTime(2019,11,27,00,00,00)):Dates.Minute(30):now())
 m = length(Dtime)
 # Initialize SWC matrice with 66 columns, m rows
 SWC = Array{Union{Float64,Missing}}(missing,m,66)
@@ -23,14 +26,14 @@ nextit = collect(0:5:5*n-1)
 for j = 1:11
     for i = 1:m
         k = nextit[j]
-        t = findfirst(x -> x == Dtime[i],data[j].DateTime)
+        t = findfirst(x -> x == Dtime[i],data[j].datetime)
         if isnothing(t) == false
-            SWC[i,j+k] = data[j].SWC_1[t]
-            SWC[i,j+1+k] = data[j].SWC_2[t]
-            SWC[i,j+2+k] = data[j].SWC_3[t]
-            SWC[i,j+3+k] = data[j].SWC_4[t]
-            SWC[i,j+4+k] = data[j].SWC_5[t]
-            SWC[i,j+5+k] = data[j].SWC_6[t]
+            SWC[i,j+k] = data[j].value[t]
+            SWC[i,j+1+k] = data[j].value[t+2]
+            SWC[i,j+2+k] = data[j].value[t+4]
+            SWC[i,j+3+k] = data[j].value[t+6]
+            SWC[i,j+4+k] = data[j].value[t+8]
+            SWC[i,j+5+k] = data[j].value[t+10]
         end
     end
 end
@@ -50,27 +53,6 @@ for j = 1:66
         end
     end
 end
-
-# Initialize plot for gif
-z = SWC[175,:] # Dtime[175] = 2019-11-22T15:00:00
-use = findall(!isnan,z) # all non NaN values in z
-scatter(x[use],y[use],color=:redsblues,markersize=10,zcolor=z[use],
-xlabel="x (m)",ylabel="y (m)",title=Dates.format(Dtime[175], "e, dd u yyyy HH:MM:SS"),
-xticks = 0:12.5:87.5,yticks = 0:12.5:87.5,colorbar_title = "Soil Moisture",
-clim=(0.35,0.48))
-plot!(legend = nothing)
-
-# Make gif, fps = 2
-anim = @animate for i = collect(175:48:m)
-    z = zcolor=SWC[i,:]
-    use = findall(!isnan,z) # all non NaN values in z
-    scatter(x[use],y[use],color=:redsblues,markersize=10,zcolor=z[use],
-    xlabel="x (m)",ylabel="y (m)",title=Dates.format(Dtime[i], "e, dd u yyyy HH:MM:SS"),
-    xticks = 0:12.5:87.5,yticks = 0:12.5:87.5,colorbar_title = "Soil Moisture",
-    clim=(0.35,0.48))
-    plot!(legend = nothing)
-end
-gif(anim,"Output\\anim_5days_v3.gif",fps=2)
 
 # Download met data
 url = "http://www.atmos.anl.gov/ANLMET/numeric/2019/nov19met.data"
@@ -99,6 +81,18 @@ Dtime_met = Array{DateTime}(undef,met_n)
 for i = 1:met_n
     Dtime_met[i] = DateTime(metdata.Year[i]+2000,metdata.Month[i],metdata.DOM[i],parse(Int64,metdata_time_str[i][1:2]),parse(Int64,metdata_time_str[i][3:4]))
 end
+
+# Make gif, fps = 2
+anim = @animate for i = collect(25:48:m)
+    z = zcolor=SWC[i,:]
+    use = findall(!isnan,z) # all non NaN values in z
+    scatter(x[use],y[use],color=:redsblues,markersize=10,zcolor=z[use],
+    xlabel="x (m)",ylabel="y (m)",title=Dates.format(Dtime[i], "e, dd u yyyy HH:MM:SS"),
+    xticks = 0:12.5:87.5,yticks = 0:12.5:87.5,colorbar_title = "Soil Moisture",
+    clim=(0.35,0.48))
+    plot!(legend = nothing)
+end
+gif(anim,"Output\\anim_5days_v3.gif",fps=2)
 
 # TO DO: add a subplot with timeseries of SWC (mean + std) + Precip bar on right axis
 
