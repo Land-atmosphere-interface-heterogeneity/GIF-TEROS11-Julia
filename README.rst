@@ -8,7 +8,7 @@ Sensor field of soil moisture
 
 100 by 100 m grid of 64 sensors of soil moisture and temperature 
 
-|Animation|
+|Animation1|
 
-.. |Animation| image:: ./images/Animation.gif
+.. |Animation1| image:: ./images/Animation1.gif
 
