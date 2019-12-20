@@ -41,14 +41,6 @@ MD = CSV.read("Input\\Metadata.csv")
 x = MD.x*12.5
 y = MD.y*12.5
 SWC = replace(SWC, 0.0=>missing)
-# could find something more elegant to do the loop below...
-for j = 1:66
-    for i = 1:m
-        if SWC[i,j] < 0.35 || SWC[i,j] > 0.5
-            SWC[i,j] = NaN
-        end
-    end
-end
 
 # Download met data
 url = "http://www.atmos.anl.gov/ANLMET/numeric/2019/nov19met.data"
@@ -87,10 +79,6 @@ for i = 1:30
     Dtime_met_d[i] = Date(DateTime(2019,11,i))
 end
 
-# TO DO: add a subplot with timeseries of SWC (mean + std) + Precip bar on right axis
-
-# TO DO: Make the script run automatically daily (or weekly).
-
 # Need same datetime (daily) for SWC data and met data
 Dtime_all = collect(Date(2019, 11, 23):Day(1):today())
 n_all = length(Dtime_all)
@@ -99,17 +87,19 @@ SWC_daily = Array{Union{Float64,Missing}}(missing,n_all,66)
 Precip_daily = Array{Float64}(undef,n_all)
 for i = collect(1:n_all)
     SWC_daily[i,:] = SWC[25+(i-1)*48,:]
-    SWC_daily_mean[i] = mean(skipmissing(SWC[i,:]))
+    SWC_daily_mean[i] = mean(skipmissing(SWC_daily[i,:]))
     t = findfirst(x -> x == Dtime_all[i],Dtime_met_d)
     if isnothing(t) == false
         Precip_daily[i] = Precip_d[t]
     end
 end
 
+clibrary(:misc) # chosing a library of colormap
+
 anim = @animate for i = collect(1:1:n_all)
     z = SWC_daily[i,:]
     use = findall(!ismissing,z) # all non missing values in z
-    p1 = scatter(x[use],y[use],color=:redsblues,markersize=10,zcolor=z[use],
+    p1 = scatter(x[use],y[use],color=:lighttest_r,markersize=10,zcolor=z[use],
     xlabel="x (m)",ylabel="y (m)",title=Dates.format(Dtime_all[i], "e, dd u yyyy"),
     xticks = 0:12.5:87.5,yticks = 0:12.5:87.5,colorbar_title = "Soil Moisture",
     clim=(0.35,0.48),size=(500,500));
@@ -118,10 +108,12 @@ anim = @animate for i = collect(1:1:n_all)
     ylims=(0,maximum(Precip_daily)),ylabel="Precip (mm)");
     plot!(twinx(),Dtime_all[1:i],SWC_daily_mean[1:i],
     xlims=(Dates.value(Dtime_all[1]),Dates.value(Dtime_all[n_all])),
-    ylims=(0.414,0.417),ylabel="SWC")
+    ylims=(0.39,0.43),ylabel="SWC")
     l = @layout [a{0.8h}; b]
     plot(p1, p2, layout=l,size=(500,600))
     #plot!(legend = nothing)
 end
 gif(anim,"Output\\anim_5days_v3.gif",fps=5)
+
+# NB. the script will crash if TEROS data is not updated to latest day because we use today() date
 
