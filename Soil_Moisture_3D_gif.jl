@@ -95,25 +95,25 @@ for i = collect(1:n_all)
 end
 
 clibrary(:misc) # chosing a library of colormap
+plot() # Initaliaze empty plot object
 
 anim = @animate for i = collect(1:1:n_all)
     z = SWC_daily[i,:]
     use = findall(!ismissing,z) # all non missing values in z
-    p1 = scatter(x[use],y[use],color=:lighttest_r,markersize=10,zcolor=z[use],
+    p1 = scatter(x[use],y[use],color=:lighttest_r,markersize=7,zcolor=z[use],
     xlabel="x (m)",ylabel="y (m)",title=Dates.format(Dtime_all[i], "e, dd u yyyy"),
     xticks = 0:12.5:87.5,yticks = 0:12.5:87.5,colorbar_title = "Soil Moisture",
-    clim=(0.35,0.48),size=(500,500));
+    clim=(0.35,0.48),size=(500,500),label="",markershape=:rect);
     p2 = bar(Dtime_all[1:i],Precip_daily[1:i],
     xlims=(Dates.value(Dtime_all[1]),Dates.value(Dtime_all[n_all])),
-    ylims=(0,maximum(Precip_daily)),ylabel="Precip (mm)");
+    ylims=(0,maximum(Precip_daily)),ylabel="Precip (mm)",label="");
     plot!(twinx(),Dtime_all[1:i],SWC_daily_mean[1:i],
     xlims=(Dates.value(Dtime_all[1]),Dates.value(Dtime_all[n_all])),
-    ylims=(0.39,0.43),ylabel="SWC")
-    l = @layout [a{0.8h}; b]
-    plot(p1, p2, layout=l,size=(500,600))
+    ylims=(0.39,0.43),ylabel="SWC",label="")
+    l = @layout [a{0.8h}; b{0.9w}]
+    plot(p1, p2, layout=l,size=(500,500))
     #plot!(legend = nothing)
 end
 gif(anim,"Output\\anim_5days_v3.gif",fps=5)
 
 # NB. the script will crash if TEROS data is not updated to latest day because we use today() date
-
