@@ -117,3 +117,4 @@ end
 gif(anim,"Output\\anim_5days_v3.gif",fps=5)
 
 # NB. the script will crash if TEROS data is not updated to latest day because we use today() date
+# test
