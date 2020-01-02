@@ -83,11 +83,13 @@ end
 Dtime_all = collect(Date(2019, 11, 23):Day(1):today())
 n_all = length(Dtime_all)
 SWC_daily_mean = Array{Float64}(undef,n_all)
+SWC_daily_std = Array{Float64}(undef,n_all)
 SWC_daily = Array{Union{Float64,Missing}}(missing,n_all,66)
 Precip_daily = Array{Float64}(undef,n_all)
 for i = collect(1:n_all-1) # up to day before today, in case it's before noon
     SWC_daily[i,:] = SWC[25+(i-1)*48,:]
     SWC_daily_mean[i] = mean(skipmissing(SWC_daily[i,:]))
+    SWC_daily_std[i] = std(skipmissing(SWC_daily[i,:]))
     t = findfirst(x -> x == Dtime_all[i],Dtime_met_d)
     if isnothing(t) == false
         Precip_daily[i] = Precip_d[t]
@@ -102,13 +104,13 @@ anim = @animate for i = collect(1:1:n_all-1) # up to day before today, in case i
     p1 = scatter(x[use],y[use],color=:lighttest_r,markersize=7,zcolor=z[use],
     xlabel="x (m)",ylabel="y (m)",title=Dates.format(Dtime_all[i], "e, dd u yyyy"),
     xticks = 0:12.5:87.5,yticks = 0:12.5:87.5,colorbar_title = "Soil Moisture",
-    clim=(0.35,0.48),size=(500,500),label="",markershape=:rect);
+    clim=(0.35,0.485),size=(500,500),label="",markershape=:rect);
     p2 = bar(Dtime_all[1:i],Precip_daily[1:i],
     xlims=(Dates.value(Dtime_all[1]),Dates.value(Dtime_all[n_all])),
-    ylims=(0,maximum(Precip_daily)),ylabel="Precip (mm)",label="");
-    plot!(twinx(),Dtime_all[1:i],SWC_daily_mean[1:i],
+    ylims=(0,maximum(Precip_daily)),ylabel="Precip (mm)",label="",grid=false);
+    plot!(twinx(),Dtime_all[1:i],SWC_daily_mean[1:i],linewidth=2,
     xlims=(Dates.value(Dtime_all[1]),Dates.value(Dtime_all[n_all])),
-    ylims=(0.39,0.43),ylabel="SWC",label="")
+    ylims=(0.37,0.45),ylabel="SWC",label="",grid=false,ribbon=SWC_daily_std,fillalpha=.2)
     l = @layout [a{0.8h}; b{0.9w}]
     plot(p1, p2, layout=l,size=(500,500))
     #plot!(legend = nothing)
