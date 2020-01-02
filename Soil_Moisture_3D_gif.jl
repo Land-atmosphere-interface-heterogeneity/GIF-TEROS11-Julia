@@ -3,10 +3,10 @@
 # Define current working directory
 cd("C:\\Users\\arenchon\\Documents\\GitHub\\GIF-TEROS11-Julia")
 
-# Used Packages
+# Load Packages
 using DataFrames; using CSV; using Dates; using Plots; using Statistics;
 
-# First part of this code is similar to Plot_input.jl
+# Load soil moisture data
 Input_FN = readdir("Input\\TEROS\\")
 permute!(Input_FN,[3,4,5,6,7,8,9,10,11,1,2]) # need to reorder from 1 to 11
 n = length(Input_FN) # this is the number of input files, useful later
@@ -85,7 +85,7 @@ n_all = length(Dtime_all)
 SWC_daily_mean = Array{Float64}(undef,n_all)
 SWC_daily = Array{Union{Float64,Missing}}(missing,n_all,66)
 Precip_daily = Array{Float64}(undef,n_all)
-for i = collect(1:n_all)
+for i = collect(1:n_all-1) # up to day before today, in case it's before noon
     SWC_daily[i,:] = SWC[25+(i-1)*48,:]
     SWC_daily_mean[i] = mean(skipmissing(SWC_daily[i,:]))
     t = findfirst(x -> x == Dtime_all[i],Dtime_met_d)
@@ -95,9 +95,8 @@ for i = collect(1:n_all)
 end
 
 clibrary(:misc) # chosing a library of colormap
-plot() # Initaliaze empty plot object
 
-anim = @animate for i = collect(1:1:n_all)
+anim = @animate for i = collect(1:1:n_all-1) # up to day before today, in case it's before noon
     z = SWC_daily[i,:]
     use = findall(!ismissing,z) # all non missing values in z
     p1 = scatter(x[use],y[use],color=:lighttest_r,markersize=7,zcolor=z[use],
