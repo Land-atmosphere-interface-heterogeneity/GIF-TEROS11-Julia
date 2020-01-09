@@ -115,7 +115,7 @@ anim = @animate for i = collect(1:1:n_all-1) # up to day before today, in case i
     plot(p1, p2, layout=l,size=(500,500))
     #plot!(legend = nothing)
 end
-gif(anim,"Output\\anim_5days_v3.gif",fps=5)
+gif(anim,"images\\Animation1.gif",fps=5)
 
 # NB. the script will crash if TEROS data is not updated to latest day because we use today() date
 # test 8 Jan
