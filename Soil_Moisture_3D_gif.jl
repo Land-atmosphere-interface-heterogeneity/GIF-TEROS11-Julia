@@ -119,3 +119,19 @@ gif(anim,"images\\Animation1.gif",fps=5)
 
 # NB. the script will crash if TEROS data is not updated to latest day because we use today() date
 # test 8 Jan
+
+using Makie
+
+z = SWC_daily[11,:]
+use = findall(!ismissing,z)
+data = reshape(z[use],(8,8))
+scene = Makie.heatmap(data, resolution=(500,500), interpolate = true)
+N = size(SWC_daily)[1]
+
+record(scene, "Heatmap.mp4", 12:N-1; framerate = 5) do i
+	z = SWC_daily[i,:]
+	use = findall(!ismissing,z)
+	data = reshape(z[use],(8,8))
+	Makie.heatmap!(scene, data, interpolate = true)
+end
+

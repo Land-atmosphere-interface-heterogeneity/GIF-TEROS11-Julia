@@ -10,5 +10,10 @@ Sensor field of soil moisture
 
 |Animation1|
 
+Heatmap (interpolated)
+
+|Heatmap|
+
 .. |Animation1| image:: ./images/Animation1.gif
 
+.. |Heatmap| video:: ./images/Heatmap.mp4
