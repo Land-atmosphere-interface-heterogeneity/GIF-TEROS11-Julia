@@ -16,4 +16,4 @@ Heatmap (interpolated)
 
 .. |Animation1| image:: ./images/Animation1.gif
 
-.. |Heatmap| video:: ./images/Heatmap.mp4
+.. |Heatmap| image:: ./images/Heatmap.gif
