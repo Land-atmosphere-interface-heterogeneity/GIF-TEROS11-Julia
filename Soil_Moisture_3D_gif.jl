@@ -120,18 +120,28 @@ gif(anim,"images\\Animation1.gif",fps=5)
 # NB. the script will crash if TEROS data is not updated to latest day because we use today() date
 # test 8 Jan
 
-using Makie
+using Makie; using SparseArrays;
 
 z = SWC_daily[11,:]
-use = findall(!ismissing,z)
-data = reshape(z[use],(8,8))
-scene = Makie.heatmap(data, resolution=(500,500), interpolate = true)
+use = findall(!ismissing,z); usex = findall(!ismissing,MD.x); usey = findall(!ismissing,MD.y);
+x = convert(Array{Int64,1},MD.x[usex]); x = x .+ 1 # .+ for element by element
+y = convert(Array{Int64,1},MD.y[usey]); y = y .+ 1
+z = convert(Array{Float64,1},z[use])
+sparse_m = sparse(x, y, z)
+mat = Matrix(sparse_m)
+scene = Makie.heatmap(x, y, mat, resolution=(500,500), interpolate = true, colormap = Reverse(:lighttest))
 N = size(SWC_daily)[1]
 
-record(scene, "Heatmap.mp4", 12:N-1; framerate = 5) do i
+record(scene, "Heatmap.gif", 12:N-1; framerate = 5) do i
 	z = SWC_daily[i,:]
-	use = findall(!ismissing,z)
-	data = reshape(z[use],(8,8))
-	Makie.heatmap!(scene, data, interpolate = true)
+	use = findall(!ismissing,z); usex = findall(!ismissing,MD.x); usey = findall(!ismissing,MD.y);
+	x = convert(Array{Int64,1},MD.x[usex]); x = x .+ 1 # .+ for element by element
+	y = convert(Array{Int64,1},MD.y[usey]); y = y .+ 1
+	z = convert(Array{Float64,1},z[use])
+	sparse_m = sparse(x, y, z)
+	mat = Matrix(sparse_m)
+	Makie.heatmap!(scene, x, y, mat, interpolate = true, colormap = Reverse(:lighttest))	
 end
+ 
+
 

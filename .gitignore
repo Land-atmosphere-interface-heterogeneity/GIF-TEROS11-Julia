@@ -1,3 +1,5 @@
 # ignore input and output files
 Output/
 Input/
+Soil_Moisture_3D_gif.jl~
+.Soil_Moisture_3D_gif.jl.un~
