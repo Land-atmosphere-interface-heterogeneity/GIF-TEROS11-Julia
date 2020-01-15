@@ -129,7 +129,7 @@ y = convert(Array{Int64,1},MD.y[usey]); y = y .+ 1
 z = convert(Array{Float64,1},z[use])
 sparse_m = sparse(x, y, z)
 mat = Matrix(sparse_m)
-scene = Makie.heatmap(x, y, mat, resolution=(500,500), interpolate = true, colormap = Reverse(:lighttest))
+scene = Makie.heatmap(x, y, mat, resolution=(500,500), interpolate = true, colormap = Reverse(:lighttest), colorrange = (0.35,0.485), show_axis = false)
 N = size(SWC_daily)[1]
 
 record(scene, "Heatmap.gif", 12:N-1; framerate = 5) do i
@@ -140,7 +140,7 @@ record(scene, "Heatmap.gif", 12:N-1; framerate = 5) do i
 	z = convert(Array{Float64,1},z[use])
 	sparse_m = sparse(x, y, z)
 	mat = Matrix(sparse_m)
-	Makie.heatmap!(scene, x, y, mat, interpolate = true, colormap = Reverse(:lighttest))	
+	Makie.heatmap!(scene, x, y, mat, interpolate = true, colormap = Reverse(:lighttest), colorrange = (0.35,0.485))	
 end
  
 
