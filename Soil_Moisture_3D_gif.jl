@@ -144,4 +144,46 @@ record(scene, "Heatmap.gif", 12:N-1; framerate = 5) do i
 end
  
 
+# 3D map, SWC + water table
+# NEXT will be soil co2 efflux as bar 
+# Need to add timeseries of SWC, Tsoil and precip as a subplot
+# Need to add colorlegend
+# Need a way to deal with missing values. Possibility: replace by 0
+# etc. 
+
+using GLMakie, GeometryTypes
+
+z = SWC_daily[11,:]
+use = findall(!ismissing,z); usex = findall(!ismissing,MD.x); usey = findall(!ismissing,MD.y);
+x = convert(Array{Int64,1},MD.x[usex]); x = x .+ 1 # .+ for element by element
+y = convert(Array{Int64,1},MD.y[usey]); y = y .+ 1
+z = convert(Array{Float64,1},z[use])
+sparse_m = sparse(x, y, z)
+mat = Matrix(sparse_m)
+c_SWC = GLMakie.vec2color(mat, Reverse(:lighttest), (0.37,0.45))
+elev = rand(8,8) # will need to replace this with actual elevation data
+s = Makie.surface(1:8, 1:8, elev, color = c_SWC, shading = false)
+N = size(SWC_daily)[1]
+
+record(s, "3DHeatmap.gif", 12:N-1; framerate = 5) do i
+	z = SWC_daily[i,:]
+	use = findall(!ismissing,z); usex = findall(!ismissing,MD.x); usey = findall(!ismissing,MD.y);
+	x = convert(Array{Int64,1},MD.x[usex]); x = x .+ 1 # .+ for element by element
+	y = convert(Array{Int64,1},MD.y[usey]); y = y .+ 1
+	z = convert(Array{Float64,1},z[use])
+	sparse_m = sparse(x, y, z)
+	mat = Matrix(sparse_m)
+	c_SWC = GLMakie.vec2color(mat, Reverse(:lighttest), (0.37,0.45))
+	Makie.surface!(s,1:8, 1:8, elev, color = c_SWC, shading = false)	
+end
+
+
+
+
+
+
+
+
+
+
 

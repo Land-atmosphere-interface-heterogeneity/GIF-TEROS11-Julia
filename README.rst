@@ -14,6 +14,12 @@ Heatmap (interpolated)
 
 |Heatmap|
 
+3D Heatmap (interpolated)
+
+|3DHeatmap|
+
 .. |Animation1| image:: ./images/Animation1.gif
 
 .. |Heatmap| image:: ./images/Heatmap.gif
+
+.. |3DHeatmap| image:: ./images/3dHeatmap.gif
