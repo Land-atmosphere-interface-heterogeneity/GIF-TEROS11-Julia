@@ -162,7 +162,7 @@ sparse_m = sparse(x, y, z)
 mat = Matrix(sparse_m)
 c_SWC = GLMakie.vec2color(mat, Reverse(:lighttest), (0.37,0.45))
 elev = rand(8,8) # will need to replace this with actual elevation data
-s = Makie.surface(1:8, 1:8, elev, color = c_SWC, shading = false)
+s = Makie.surface(1:8, 1:8, elev, color = c_SWC, shading = false, resolution = (500,500))
 N = size(SWC_daily)[1]
 
 record(s, "3DHeatmap.gif", 12:N-1; framerate = 5) do i
