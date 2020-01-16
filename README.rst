@@ -22,4 +22,4 @@ Heatmap (interpolated)
 
 .. |Heatmap| image:: ./images/Heatmap.gif
 
-.. |3DHeatmap| image:: ./images/3dHeatmap.gif
+.. |3DHeatmap| image:: ./images/3DHeatmap.gif
