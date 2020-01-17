@@ -161,9 +161,13 @@ z = convert(Array{Float64,1},z[use])
 sparse_m = sparse(x, y, z)
 mat = Matrix(sparse_m)
 c_SWC = GLMakie.vec2color(mat, Reverse(:lighttest), (0.37,0.45))
-elev = rand(8,8) # will need to replace this with actual elevation data
-s = Makie.surface(1:8, 1:8, elev, color = c_SWC, shading = false, resolution = (500,500))
+elev = rand(8,8).+1 # will need to replace this with actual elevation data
+s = Makie.surface(0:7, 0:7, elev, color = c_SWC, shading = false, resolution = (500,500))
 N = size(SWC_daily)[1]
+# Add water table (blue cube)
+x = [0,0,0]; Ylen = 7; Zlen = 1; Xlen = 7;
+rectangle = HyperRectangle(Vec3f0(x), Vec3f0(Xlen, Ylen, Zlen))
+mesh!(s,rectangle, color = RGBAf0(0,0,1,0.5))
 
 record(s, "3DHeatmap.gif", 12:N-1; framerate = 5) do i
 	z = SWC_daily[i,:]
@@ -174,7 +178,7 @@ record(s, "3DHeatmap.gif", 12:N-1; framerate = 5) do i
 	sparse_m = sparse(x, y, z)
 	mat = Matrix(sparse_m)
 	c_SWC = GLMakie.vec2color(mat, Reverse(:lighttest), (0.37,0.45))
-	Makie.surface!(s,1:8, 1:8, elev, color = c_SWC, shading = false)	
+	Makie.surface!(s,0:7, 0:7, elev, color = c_SWC, shading = false)	
 end
 
 

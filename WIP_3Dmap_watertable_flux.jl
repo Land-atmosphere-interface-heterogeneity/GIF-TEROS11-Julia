@@ -11,7 +11,7 @@ p = image!(scene,RGBAf0.(color.(img), 0.7))
 # + a volume representing the water table
 ## on a black background
 
-s = surface(collect(1:8),collect(1:8),rand(8,8).*1.5,color = RGBAf0.(color.(img), 0.7)) #, backgroundcolor = :black)
+s = surface(collect(1:8),collect(1:8),rand(8,8).*1.5,color = RGBAf0.(color.(img), 0.7), shading = false) #, backgroundcolor = :black)
 #s[Axis].names.textcolor = :gray
 #ls = colorlegend(s[end], raw = true, camera = campixel!) #, backgroundcolor = :black)
 #scene_final = vbox(s, ls)
@@ -27,7 +27,15 @@ s = surface(collect(1:8),collect(1:8),rand(8,8), color = color_test)
 # Other (better, simpler) code for the same thing: 
 using GLMakie
 color_test2 = GLMakie.vec2color(rand(8,8), :lighttest, (0.3,0.5))
-s = surface(collect(1:8),collect(1:8),rand(8,8), color = color_test)
+s = surface(collect(0:7),collect(0:7),rand(8,8).+1, color = color_test2, shading = false,
+resolution = (500,500))
+# Add blue cube
+x = [0,0,0]; Ylen = 7; Zlen = 1; Xlen = 7;
+rectangle = HyperRectangle(Vec3f0(x), Vec3f0(Xlen, Ylen, Zlen))
+mesh!(s,rectangle, color = RGBAf0(0,0,1,0.5))
+
+# cube is: x = 0-8, y = 0-1, z = 0-1
+# surface is: x = 1-8, y = 1-8, z = 1-2 
 
 # Plotting a cube volume (for the water table)
 using Makie, GeometryTypes
