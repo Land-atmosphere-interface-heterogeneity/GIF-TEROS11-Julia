@@ -1,4 +1,4 @@
-using Images, Makie, Colors
+using Images, Makie, Colors, GLMakie, GeometryTypes
 
 # Heatmap on an image
 cd("C:\\Users\\arenchon\\Documents\\GitHub\\GIF-TEROS11-Julia")
@@ -25,9 +25,8 @@ color_test = cgrad(g) |> C;
 s = surface(collect(1:8),collect(1:8),rand(8,8), color = color_test)
 
 # Other (better, simpler) code for the same thing: 
-using GLMakie
-color_test2 = GLMakie.vec2color(rand(8,8), :lighttest, (0.3,0.5))
-s = surface(collect(0:7),collect(0:7),rand(8,8).+1, color = color_test2, shading = false,
+color_test2 = GLMakie.vec2color(rand(8,8), Reverse(:lighttest), (0.3,0.5))
+s = surface(0:7,0:7,rand(8,8).+1, color = color_test2, shading = false,
 resolution = (500,500))
 # Add blue cube
 x = [0,0,0]; Ylen = 7; Zlen = 1; Xlen = 7;
@@ -61,3 +60,13 @@ using Plots
 clibrary(:misc)
 C(g::ColorGradient) = RGB[g[z] for z=collect(0.37:0.01:0.45)]
 g = :lighttest
+
+
+# USING NODES
+scene = Scene(resolution = (500,500))
+xyz = Node(rand(8, 8))
+surface!(scene, xyz, shading = false)
+xyz[] = rand(8, 8) # this updates the node and therefore the buffers on the gpu
+
+
+
