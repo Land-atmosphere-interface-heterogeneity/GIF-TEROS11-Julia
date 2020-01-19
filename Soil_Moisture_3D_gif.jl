@@ -184,7 +184,3 @@ record(s, "3DHeatmap.gif", 12:N-1; framerate = 5) do i
 	rectangle[] = HyperRectangle(Vec3f0(x_or), Vec3f0(Xlen, Ylen, Water_table[i]))
 end
 
-
-
-# I need to use "Nodes" to update objects inside the scene. WIP
-

@@ -2,7 +2,7 @@ using Images, Makie, Colors, GLMakie, GeometryTypes
 
 # 3D heatmap: 
 color_test2 = GLMakie.vec2color(rand(8,8), Reverse(:lighttest), (0.3,0.5))
-elev = rand(8,8).+1
+elev = Node(rand(8,8).+1)
 s = surface(0:7,0:7,elev, color = color_test2, shading = false,
 resolution = (500,500))
 # Add blue cube:
@@ -26,9 +26,11 @@ meshscatter!(s,
 
 
 # simple code to troubleshoot elevation
+coord = collect(0:7).-0.2; coord[1] = 0
 elev = rand(8,8).+1
-s = surface(0:7,0:7,elev, shading = false, resolution = (500,500))
-meshscatter!(s, 0:7, 0:7, elev, marker = Rect3D(Vec3f0(0), Vec3f0(1)),
+Height = Node(elev)
+s = surface(0:7,0:7,Height, shading = false, resolution = (500,500))
+meshscatter!(s, coord, coord, Height, marker = Rect3D(Vec3f0(0), Vec3f0(1)),
      markersize = Vec3f0.(0.2, 0.2, 0.3), color = RGBAf0(0,0,0,0.2))
 
 
@@ -95,4 +97,24 @@ surface!(scene, xyz, shading = false)
 xyz[] = rand(8, 8) # this updates the node and therefore the buffers on the gpu
 
 
+#Adjusting scene limits
 
+ x = range(0, stop = 10, length = 40)
+ y = x
+ # specify the scene limits, note that the arguments for FRect are
+ #    x_min, y_min, x_dist, y_dist,
+ #    therefore, the maximum x and y limits are then x_min + x_dist and y_min + y_dist
+ 
+ limits = FRect(-5, -10, 20, 30)
+
+ scene = lines(x, y, color = :blue, limits = limits)
+
+# Axis naming
+axis = scene[Axis] # get the axis object from the scene
+ axis.grid.linecolor = ((:red, 0.5), (:blue, 0.5))
+ axis.names.textcolor = ((:red, 1.0), (:blue, 1.0))
+ axis.names.axisnames = ("x", "y = cos(x)")
+ scene
+
+# Layouting
+https://simondanisch.github.io/ReferenceImages/gallery/layouting/index.html
