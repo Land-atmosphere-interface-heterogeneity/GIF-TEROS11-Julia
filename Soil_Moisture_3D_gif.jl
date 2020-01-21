@@ -44,12 +44,18 @@ SWC = replace(SWC, 0.0=>missing)
 
 # Download met data
 url = "http://www.atmos.anl.gov/ANLMET/numeric/2019/nov19met.data"
+url2 = "http://www.atmos.anl.gov/ANLMET/numeric/2019/dec19met.data"
 met_path = "Input\\MET TOWER\\nov19met.data"
+met_path2 = "Input\\MET TOWER\\dec19met.data"
 download(url,met_path)
+download(url2,met_path2)
+
 
 # Read met data
 col_name = [:DOM,:Month,:Year,:Time,:PSC,:WD60,:WS60,:WD_STD60,:T60,:WD10,:WS10,:WD_STD10,:T10,:DPT,:RH,:TD100,:Precip,:RS,:RN,:Pressure,:WatVapPress,:TS10,:TS100,:TS10F]
 metdata = CSV.read(met_path, delim=' ',header=col_name,ignorerepeated=true,datarow=1,footerskip=2)
+metdata2 = CSV.read(met_path2, delim=' ',header=col_name,ignorerepeated=true,datarow=1,footerskip=2)
+metdata = vcat(metdata,metdata2)
 met_n = size(metdata,1)
 
 # Create a DateTime vector from metdata Month, Year and Time
@@ -71,12 +77,18 @@ for i = 1:met_n
 end
 
 # Integrate daily Precip
-Precip_d = Array{Float64}(undef,30)
-Dtime_met_d = Array{DateTime}(undef,30)
+# I need to redo this... this is not clean. Maybe fixing latest rain on ANLMET website should be done first. 
+Precip_d = Array{Float64}(undef,61)
+Dtime_met_d = Array{DateTime}(undef,61)
 for i = 1:30
     use = findall(x -> Dates.day(x) == i && Dates.month(x) == 11,Dtime_met)
     Precip_d[i] = sum(metdata.Precip[use])
     Dtime_met_d[i] = Date(DateTime(2019,11,i))
+end
+for i = 1:31
+    use = findall(x -> Dates.day(x) == i && Dates.month(x) == 12,Dtime_met)
+    Precip_d[30 + i] = sum(metdata.Precip[use])
+    Dtime_met_d[30 + i] = Date(DateTime(2019,12,i))
 end
 
 # Need same datetime (daily) for SWC data and met data

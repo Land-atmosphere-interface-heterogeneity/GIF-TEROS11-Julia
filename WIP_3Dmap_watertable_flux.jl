@@ -40,6 +40,46 @@ axis[:names][:textsize] = (20.0,20.0,20.0)
 axis[:ticks][:textsize] = (20.0,20.0,20.0)
 axis[:ticks][:ranges_labels] = (([1.0,3.0,5.0,7.0], [1.0,3.0,5.0,7.0], [0.0,1.0, 2.0]), (["75","50","25","0"], ["75","50","25","0"], ["0", "1", "2"]))
 
+# Add a colorbar
+scene, layout = layoutscene()
+dummyrect = layout[1, 1] = LRect(scene, visible = false)
+scene3d = Scene(scene, lift(IRect2D, dummyrect.layoutnodes.computedbbox),
+    camera = cam3d!, raw = false)
+surface!(scene3d, 1:10, 1:10, rand(10, 10))
+cbar = layout[1, 2] = LColorbar(scene, width = 50, limits = (0, 10))
+scene
+
+# add a colorbar, old. does not work great
+CL = colorlegend(
+:lighttest,
+ (0.35,0.45),
+ raw = true,          # without axes or grid
+     camera = campixel!,  # gives a concrete bounding box in pixels
+                          # so that the `vbox` gives you the right size
+     width = (            # make the colorlegend longer so it looks nicer
+         30,              # the width
+         300)              # the height
+)
+scene_final = vbox(s, CL)
+
+
+
+#c = to_colormap(:lighttest) # get colors of colormap
+#s2 = image(         # to plot colors, an image is best
+#    0.35..0.48,      # x range
+#    0..10,       # y range
+#    hcat(c, c), # reshape this to a matrix for the colors
+#    show_axis = true 
+# )
+#axis2 = s2[Axis]
+#axis2[:names][:axisnames] = ("Soil moisture","")
+#axis2[:names][:textsize] = (10.0,10.0)
+#axis2[:ticks][:textsize] = (10.0,10.0)
+#axis2[:ticks][:ranges_labels] = (([0.35, 0.40, 0.45], [0.0,10.0]), (["0.35","0.40","0.45"], [" "," "]))
+# axis2[:grid][:linecolor] = ((:black, 0.5), (:white, 0.5))
+# pscene = vbox(s, s2, sizes = [0.7, 0.3])
+
+
 # Heatmap on an image
 cd("C:\\Users\\arenchon\\Documents\\GitHub\\GIF-TEROS11-Julia")
 img = load("Input\\484site.PNG")
