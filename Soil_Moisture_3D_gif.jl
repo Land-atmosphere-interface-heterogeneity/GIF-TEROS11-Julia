@@ -162,7 +162,12 @@ sparse_m = sparse(x, y, z)
 mat = Matrix(sparse_m)
 c_SWC = Node(GLMakie.vec2color(mat, Reverse(:lighttest), (0.37,0.45)))
 elev = rand(8,8).+1 # will need to replace this with actual elevation data
-s = Makie.surface(0:7, 0:7, elev, color = c_SWC, shading = false, resolution = (500,500))
+s = Makie.surface(0:7, 0:7, elev, color = c_SWC, shading = false, resolution = (500,500), limits = Rect(0, 0, 0, 7, 7, 2))
+axis = s[Axis] # get the axis object from the scene
+axis[:names][:axisnames] = ("Coordinate x (m)","Coordinate y (m)","Elevation (m)")
+axis[:names][:textsize] = (20.0,20.0,20.0)
+axis[:ticks][:textsize] = (20.0,20.0,20.0)
+axis[:ticks][:ranges_labels] = (([1.0,3.0,5.0,7.0], [1.0,3.0,5.0,7.0], [1.0, 1.25, 1.5, 1.75, 2.0]), (["75","50","25","0"], ["75","50","25","0"], ["1.00", "1.25", "1.50", "1.75", "2.00"]))
 N = size(SWC_daily)[1]
 # Add water table (blue cube)
 x_or = [0,0,0]; Ylen = 7; Zlen = 1; Xlen = 7;
@@ -182,5 +187,6 @@ record(s, "3DHeatmap.gif", 12:N-1; framerate = 5) do i
 	c_SWC[] = GLMakie.vec2color(mat, Reverse(:lighttest), (0.37,0.45))
 	# Update water table
 	rectangle[] = HyperRectangle(Vec3f0(x_or), Vec3f0(Xlen, Ylen, Water_table[i]))
+	axis[:ticks][:ranges_labels] = (([1.0,3.0,5.0,7.0], [1.0,3.0,5.0,7.0], [0.0, 1.0, 2.0]), (["75","50","25","0"], ["75","50","25","0"], ["0", "1", "2"]))
 end
 

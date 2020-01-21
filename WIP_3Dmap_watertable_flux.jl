@@ -29,13 +29,16 @@ meshscatter!(s,
 coord = collect(0:7).-0.2; coord[1] = 0
 elev = rand(8,8).+1
 Height = Node(elev)
-s = surface(0:7,0:7,Height, shading = false, resolution = (500,500))
+s = surface(0:7,0:7,Height, shading = false, resolution = (500,500), limits = Rect(0, 0, 0, 7, 7, 2))
 meshscatter!(s, coord, coord, Height, marker = Rect3D(Vec3f0(0), Vec3f0(1)),
-     markersize = Vec3f0.(0.2, 0.2, 0.3), color = RGBAf0(0,0,0,0.2))
-
-
-
-
+markersize = Vec3f0.(0.2, 0.2, 0.3), color = RGBAf0(0,0,0,0.2))
+axis = s[Axis] # get the axis object from the scene
+#axis[:grid][:linecolor] = ((:red, 0.5), (:blue, 0.5))
+#axis[:names][:textcolor] = ((:red, 1.0), (:blue, 1.0))
+axis[:names][:axisnames] = ("Coordinate x (m)","Coordinate y (m)","Elevation (m)")
+axis[:names][:textsize] = (20.0,20.0,20.0)
+axis[:ticks][:textsize] = (20.0,20.0,20.0)
+axis[:ticks][:ranges_labels] = (([1.0,3.0,5.0,7.0], [1.0,3.0,5.0,7.0], [0.0,1.0, 2.0]), (["75","50","25","0"], ["75","50","25","0"], ["0", "1", "2"]))
 
 # Heatmap on an image
 cd("C:\\Users\\arenchon\\Documents\\GitHub\\GIF-TEROS11-Julia")
