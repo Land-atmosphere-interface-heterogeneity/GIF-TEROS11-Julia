@@ -1,5 +1,19 @@
 using Images, Makie, Colors, GLMakie, GeometryTypes
 
+# standard deviation as a shaded area
+using Makie, Statistics
+n, m = 100, 101
+t = range(0, 1, length=m)
+X = cumsum(randn(n, m), dims = 2)
+X = X .- X[:, 1]
+μ = vec(mean(X, dims=1))
+lines(t, μ)
+σ = vec(std(X, dims=1))
+band!(t, μ + σ, μ - σ)
+
+
+
+
 # 3D heatmap: 
 color_test2 = GLMakie.vec2color(rand(8,8), Reverse(:lighttest), (0.3,0.5))
 elev = Node(rand(8,8).+1)

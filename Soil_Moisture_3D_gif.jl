@@ -119,7 +119,7 @@ anim = @animate for i = collect(1:1:n_all-1) # up to day before today, in case i
     clim=(0.35,0.485),size=(500,500),label="",markershape=:rect);
     p2 = bar(Dtime_all[1:i],Precip_daily[1:i],
     xlims=(Dates.value(Dtime_all[1]),Dates.value(Dtime_all[n_all])),
-    ylims=(0,maximum(Precip_daily)),ylabel="Precip (mm)",label="",grid=false);
+    ylims=(0,maximum(Precip_daily)),ylabel="Rainfall (mm)",label="",grid=false);
     plot!(twinx(),Dtime_all[1:i],SWC_daily_mean[1:i],linewidth=2,
     xlims=(Dates.value(Dtime_all[1]),Dates.value(Dtime_all[n_all])),
     ylims=(0.37,0.45),ylabel="SWC",label="",grid=false,ribbon=SWC_daily_std,fillalpha=.2)
@@ -144,7 +144,7 @@ mat = Matrix(sparse_m)
 scene = Makie.heatmap(x, y, mat, resolution=(500,500), interpolate = true, colormap = Reverse(:lighttest), colorrange = (0.35,0.485), show_axis = false)
 N = size(SWC_daily)[1]
 
-record(scene, "Heatmap.gif", 12:N-1; framerate = 5) do i
+record(scene, "images\\Heatmap.gif", 12:N-1; framerate = 5) do i
 	z = SWC_daily[i,:]
 	use = findall(!ismissing,z); usex = findall(!ismissing,MD.x); usey = findall(!ismissing,MD.y);
 	x = convert(Array{Int64,1},MD.x[usex]); x = x .+ 1 # .+ for element by element
@@ -187,7 +187,7 @@ rectangle = Node(HyperRectangle(Vec3f0(x_or), Vec3f0(Xlen, Ylen, Zlen)))
 mesh!(s,rectangle, color = RGBAf0(0,0,1,0.5))
 Water_table = rand(N)
 
-record(s, "3DHeatmap.gif", 12:N-1; framerate = 5) do i
+record(s, "images\\3DHeatmap.gif", 12:N-1; framerate = 5) do i
 	z = SWC_daily[i,:]
 	use = findall(!ismissing,z); usex = findall(!ismissing,MD.x); usey = findall(!ismissing,MD.y);
 	x = convert(Array{Int64,1},MD.x[usex]); x = x .+ 1 # .+ for element by element
@@ -201,4 +201,25 @@ record(s, "3DHeatmap.gif", 12:N-1; framerate = 5) do i
 	rectangle[] = HyperRectangle(Vec3f0(x_or), Vec3f0(Xlen, Ylen, Water_table[i]))
 	axis[:ticks][:ranges_labels] = (([1.0,3.0,5.0,7.0], [1.0,3.0,5.0,7.0], [0.0, 1.0, 2.0]), (["75","50","25","0"], ["75","50","25","0"], ["0", "1", "2"]))
 end
+
+
+# IN PROGRESS: time series of average and std SWC + bar of precip using Makie.jl
+
+Dtime_all_rata = Array{Int64}(undef,n_all)
+for i = 1:n_all
+	Dtime_all_rata[i] = datetime2rata(Dtime_all[i])
+end
+
+scene = Makie.lines(Dtime_all_rata[1:n_all-1],SWC_daily_mean[1:n_all-1])
+
+
+i = 60
+Plots.plot(Dtime_all[1:i],SWC_daily_mean[1:i],linewidth=2,
+ylabel="SWC",label="",grid=false,ribbon=SWC_daily_std,fillalpha=.2)
+
+
+
+
+
+
 
