@@ -218,6 +218,105 @@ Plots.plot(Dtime_all[1:i],SWC_daily_mean[1:i],linewidth=2,
 ylabel="SWC",label="",grid=false,ribbon=SWC_daily_std,fillalpha=.2)
 
 
+# IN PROGRESS: using MakieLayout to bring together all those plots in 1 figure, which will later be interactive
+
+using MakieLayout
+
+scene, layout = layoutscene(4, 2, 30, resolution = (800, 800))
+ax = Array{LAxis}(undef,5)
+ax[1] = layout[1:2, 1] = LAxis(scene, title="Scatter")
+ax[2] = layout[3:4, 1] = LAxis(scene, title="Heatmap")
+ax[3] = layout[1, 2] = LAxis(scene, title="Rain and SWC")
+ax[4] = layout[2, 2] = LAxis(scene, title="Soil temperature")
+#ax[5] = layout[3:4, 2] = LAxis(scene, title="3D Heatmap")
+
+#linkxaxes!(ax...)
+#linkyaxes!(ax...)
+
+#for i = 1:5
+#	scatter!(ax[i], rand(10), rand(10))
+#	ax[i].aspect = DataAspect()
+#end
+
+z = SWC_daily[50,:]
+use = findall(!ismissing,z)
+z = convert(Array{Float64,1},z[use])
+Makie.scatter!(ax[1],x, y, color = z, colormap = Reverse(:lighttest), markersize = .6)
+
+z = SWC_daily[50,:]
+use = findall(!ismissing,z); usex = findall(!ismissing,MD.x); usey = findall(!ismissing,MD.y);
+x = convert(Array{Int64,1},MD.x[usex]); x = x .+ 1 # .+ for element by element
+y = convert(Array{Int64,1},MD.y[usey]); y = y .+ 1
+z = convert(Array{Float64,1},z[use])
+sparse_m = sparse(x, y, z)
+mat = Matrix(sparse_m)
+Makie.heatmap!(ax[2],x, y, mat, resolution=(500,500), interpolate = true, colormap = Reverse(:lighttest), colorrange = (0.35,0.485), show_axis = false)
+
+scene
+
+##################### with 3D
+
+scene, layout = layoutscene(4,2, resolution = (800,800))
+
+dummyrect = layout[3:4, 2] = LRect(scene, visible = false)
+scene3d = Scene(scene, lift(IRect2D, dummyrect.layoutnodes.computedbbox),
+    camera = cam3d!, raw = false)
+
+c_SWC = Node(GLMakie.vec2color(mat, Reverse(:lighttest), (0.37,0.45)))
+elev = rand(8,8).+1 # will need to replace this with actual elevation data
+Makie.surface!(scene3d, 0:7, 0:7, elev, color = c_SWC, shading = false, resolution = (500,500), limits = Rect(0, 0, 0, 7, 7, 2))
+#cbar = layout[1, 2] = LColorbar(scene, width = 50, limits = (0, 10))
+
+x_or = [0,0,0]; Ylen = 7; Zlen = 1; Xlen = 7;
+rectangle = Node(HyperRectangle(Vec3f0(x_or), Vec3f0(Xlen, Ylen, Zlen)))
+mesh!(scene3d,rectangle, color = RGBAf0(0,0,1,0.5))
+
+
+
+ax = Array{LAxis}(undef,5)
+ax[1] = layout[1:2, 1] = LAxis(scene, title="Scatter")
+ax[2] = layout[3:4, 1] = LAxis(scene, title="Heatmap")
+ax[3] = layout[1, 2] = LAxis(scene, title="Rain and SWC")
+ax[4] = layout[2, 2] = LAxis(scene, title="Soil temperature")
+#ax[5] = layout[3:4, 2] = LAxis(scene, title="3D Heatmap")
+
+z = SWC_daily[50,:]
+use = findall(!ismissing,z)
+z = convert(Array{Float64,1},z[use])
+Makie.scatter!(ax[1],x, y, color = z, colormap = Reverse(:lighttest), markersize = 20 * AbstractPlotting.px)
+
+z = SWC_daily[50,:]
+use = findall(!ismissing,z); usex = findall(!ismissing,MD.x); usey = findall(!ismissing,MD.y);
+x = convert(Array{Int64,1},MD.x[usex]); x = x .+ 1 # .+ for element by element
+y = convert(Array{Int64,1},MD.y[usey]); y = y .+ 1
+z = convert(Array{Float64,1},z[use])
+sparse_m = sparse(x, y, z)
+mat = Matrix(sparse_m)
+Makie.heatmap!(ax[2],x, y, mat, resolution=(500,500), interpolate = true, colormap = Reverse(:lighttest), colorrange = (0.35,0.485), show_axis = false)
+
+Dtime_all_rata = Array{Int64}(undef,n_all)
+for i = 1:n_all
+	Dtime_all_rata[i] = datetime2rata(Dtime_all[i])
+end
+Makie.lines!(ax[3], Dtime_all_rata[1:n_all-1], SWC_daily_mean[1:n_all-1], color = :black)
+Makie.band!(ax[3], Dtime_all_rata[1:n_all-1], SWC_daily_mean[1:n_all-1] + SWC_daily_std[1:n_all-1], SWC_daily_mean[1:n_all-1] - SWC_daily_std[1:n_all-1], color = :blue)
+
+scene
+
+
+
+
+
+
+Makie.save("First_MakieLayout_Plot.png", scene)
+
+# TO DO: add dates, add proper axis labels etc., add colorbar, make it interactive with sliders and buttons
+# add the time series plots (rain, SWC, Tsoil)
+# add the rectangles for CO2 efflux in 3D subplot
+# other?
+
+
+
 
 
 
