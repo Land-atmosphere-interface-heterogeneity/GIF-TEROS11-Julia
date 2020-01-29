@@ -10,18 +10,18 @@ x = [0,0,0,1,1,1,2,2,2,3,3,3,4,4,4,5,5,5,6,6,6,7,7,7,0,0,1,1,2,2,3,3,4,4,5,5,6,6
 y = [0,1,2,2,1,0,0,1,2,2,1,0,0,1,2,2,1,0,0,1,2,2,1,0,3,4,4,3,4,3,3,4,4,3,3,4,4,3,4,3,5,6,7,7,6,5,5,6,7,7,6,5,5,6,7,7,6,5,5,6,7,7,6,5] .+ 1
 
 # Create Scene and 2D axis
-scene, layout = layoutscene(4, 2, 30, resolution = (800, 800))
+scene, layout = layoutscene(4, 2, 10, resolution = (800, 800))
 ax = Array{LAxis}(undef,4)
-ax[1] = layout[1:2, 1] = LAxis(scene, title="Scatter")
-ax[2] = layout[3:4, 1] = LAxis(scene, title="Heatmap")
-ax[3] = layout[1, 2] = LAxis(scene, title="Rain and SWC")
-ax[4] = layout[2, 2] = LAxis(scene, title="Soil temperature")
+ax[1] = layout[1:2, 1] = LAxis(scene, ylabel="y direction (m)", ylabelpadding = -25, xticklabelsvisible = false)
+ax[2] = layout[3:4, 1] = LAxis(scene, xlabel="x direction (m)", ylabel="y direction (m)", ylabelpadding = -25)
+ax[3] = layout[1, 2] = LAxis(scene, ylabel="SWC (m3 m-3)", ylabelpadding = -25, xticklabelsvisible = false)
+ax[4] = layout[2, 2] = LAxis(scene, ylabel="Tsoil (°C)", xlabel="Date", ylabelpadding = -25)
 
 # Add plots inside 2D axis
 
 # Axis top-left, scatter
 z = SWC_daily[1,:]
-Makie.scatter!(ax[1], x, y, color = z, colormap = Reverse(:lighttest), markersize = .6)
+Makie.scatter!(ax[1], x, y, color = z, colormap = Reverse(:lighttest), markersize = 20 * AbstractPlotting.px)
 
 # Axis bottom-left, heatmap
 sparse_m = sparse(x, y, z)
