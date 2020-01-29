@@ -1,0 +1,71 @@
+using Makie, MakieLayout, Dates, GLMakie, GeometryTypes, SparseArrays
+
+# Dummy data
+n_all = 100
+SWC_daily = rand(n_all, 64); SWC_daily_mean = rand(n_all, 1); SWC_daily_std = rand(n_all, 1)
+Tsoil_daily = rand(n_all, 64); Tsoil_daily_mean = rand(n_all, 1); Tsoil_daily_std = rand(n_all, 1)
+Dtime_all = collect(Date(2019, 01, 01):Day(1):Date(2019, 01, 01)+Day(n_all-1))
+elev = rand(8,8).+1
+x = [0,0,0,1,1,1,2,2,2,3,3,3,4,4,4,5,5,5,6,6,6,7,7,7,0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,0,0,0,1,1,1,2,2,2,3,3,3,4,4,4,5,5,5,6,6,6,7,7,7] .+ 1
+y = [0,1,2,2,1,0,0,1,2,2,1,0,0,1,2,2,1,0,0,1,2,2,1,0,3,4,4,3,4,3,3,4,4,3,3,4,4,3,4,3,5,6,7,7,6,5,5,6,7,7,6,5,5,6,7,7,6,5,5,6,7,7,6,5] .+ 1
+
+# Create Scene and 2D axis
+scene, layout = layoutscene(4, 2, 30, resolution = (800, 800))
+ax = Array{LAxis}(undef,4)
+ax[1] = layout[1:2, 1] = LAxis(scene, title="Scatter")
+ax[2] = layout[3:4, 1] = LAxis(scene, title="Heatmap")
+ax[3] = layout[1, 2] = LAxis(scene, title="Rain and SWC")
+ax[4] = layout[2, 2] = LAxis(scene, title="Soil temperature")
+
+# Add plots inside 2D axis
+
+# Axis top-left, scatter
+z = SWC_daily[1,:]
+Makie.scatter!(ax[1], x, y, color = z, colormap = Reverse(:lighttest), markersize = .6)
+
+# Axis bottom-left, heatmap
+sparse_m = sparse(x, y, z)
+mat = Matrix(sparse_m)
+Makie.heatmap!(ax[2], x, y, mat, interpolate = true, colormap = Reverse(:lighttest), show_axis = false)
+
+# Axis top-right 1
+Dtime_all_rata = Array{Int64}(undef, n_all)
+for i = 1:n_all
+	Dtime_all_rata[i] = datetime2rata(Dtime_all[i])
+end
+Makie.lines!(ax[3], Dtime_all_rata[1:n_all-1], SWC_daily_mean[1:n_all-1], color = :black)
+Makie.band!(ax[3], Dtime_all_rata[1:n_all-1], SWC_daily_mean[1:n_all-1] + SWC_daily_std[1:n_all-1], SWC_daily_mean[1:n_all-1] - SWC_daily_std[1:n_all-1], color = :blue)
+
+# Axis top-right 2
+Makie.lines!(ax[4], Dtime_all_rata[1:n_all-1], Tsoil_daily_mean[1:n_all-1], color = :black)
+Makie.band!(ax[4], Dtime_all_rata[1:n_all-1], Tsoil_daily_mean[1:n_all-1] + Tsoil_daily_std[1:n_all-1], Tsoil_daily_mean[1:n_all-1] - Tsoil_daily_std[1:n_all-1], color = :green)
+
+# Create 3D axis in bottom-right
+dummyrect = layout[3:4, 2] = LRect(scene, visible = false)
+scene3d = Scene(scene, lift(IRect2D, dummyrect.layoutnodes.computedbbox), camera = cam3d!, raw = false)
+
+# Add surface plot to that bottom-right 3D axis
+c_SWC = Node(GLMakie.vec2color(mat, Reverse(:lighttest), (0,1)))
+Makie.surface!(scene3d, 0:7, 0:7, elev, color = c_SWC, shading = false, limits = Rect(0, 0, 0, 7, 7, 2))
+
+# Add rectangle plot to that bottom-right 3D axis
+x_or = [0,0,0]; Ylen = 7; Zlen = 1; Xlen = 7;
+rectangle = Node(HyperRectangle(Vec3f0(x_or), Vec3f0(Xlen, Ylen, Zlen)))
+mesh!(scene3d, rectangle, color = RGBAf0(0,0,1,0.5))
+
+# Show scene
+scene
+
+
+
+
+
+
+
+
+
+
+
+
+
+
