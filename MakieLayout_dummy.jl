@@ -45,11 +45,7 @@ dummyrect = layout[3:4, 2] = LRect(scene, visible = false)
 scene3d = Scene(scene, lift(IRect2D, dummyrect.layoutnodes.computedbbox), camera = cam3d!, raw = false)
 
 # Add surface plot to that bottom-right 3D axis
-z = lift(X->SWC_daily[X,:], sl.value)
-sparse_m = sparse(x, y, z) # This line crash because sparse() doesn't work with z::Observables
-mat = Matrix(sparse_m)
-c_SWC = Node(GLMakie.vec2color(mat, Reverse(:lighttest), (0,1)))
-Makie.surface!(scene3d, 0:7, 0:7, elev, color = c_SWC, shading = false, limits = Rect(0, 0, 0, 7, 7, 2))
+Makie.surface!(scene3d, 0:7, 0:7, elev, color = lift(X-> GLMakie.vec2color(Matrix(sparse(x, y, SWC_daily[X,:])), Reverse(:lighttest), (0,1)), sl.value), shading = false, limits = Rect(0, 0, 0, 7, 7, 2))
 
 # Add rectangle plot to that bottom-right 3D axis
 x_or = [0,0,0]; Ylen = 7; Zlen = 1; Xlen = 7;
