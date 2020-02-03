@@ -44,34 +44,33 @@ scatter!(ax[2], lift(X-> [Point2f0(Dtime_all_rata[X], 0)], sl.value), marker = :
 xlims!(ax[2], (Dtime_all_rata[1], Dtime_all_rata[end]));
 ax[2].xticks[] = ManualTicks(datetime2rata.(dateticks) , Dates.format.(dateticks, "yyyy-mm-dd"))
 
-ax[4] = layout[6:7, 1:12] = LAxis(scene, ylabel = "Rs", xticklabelsvisible = false, xticksvisible = false, xgridvisible = false, ygridvisible = false, yaxisposition = :right)
+ax[4] = layout[6:7, 1:12] = LAxis(scene, ylabel = "Rs", xticklabelsvisible = false, xticksvisible = false, xgridvisible = false, ygridvisible = false, yaxisposition = :right, ylabelpadding = -25)
 lines!(ax[4], Dtime_all_rata[1:end], Rsoil_daily_mean[1:end], color = :black)
 xlims!(ax[4], (Dtime_all_rata[1], Dtime_all_rata[end]));
-
 
 ax3D = Array{LRect}(undef,3)
 cbar = Array{LColorbar}(undef,3)
 
-ax3D[1] = layout[2:5, 1:3] = LRect(scene, visible = false);
+ax3D[1] = layout[2:5, 1:4] = LRect(scene, visible = false);
 scene3D_1 = Scene(scene, lift(IRect2D, ax3D[1].layoutnodes.computedbbox), camera = cam3d!, raw = false, show_axis = true);
 surface!(scene3D_1, 0:7, 0:7, elev, color = lift(X-> GLMakie.vec2color(Matrix(sparse(x, y, SWC_daily[X,:])), Reverse(:lighttest), (0,1)), sl.value), shading = false, limits = Rect(0, 0, 0, 7, 7, 2));
 x_or = [0,0,0]; Ylen = 7; Zlen = 1; Xlen = 7;
 mesh!(scene3D_1, lift(X-> HyperRectangle(Vec3f0(x_or), Vec3f0(Xlen, Ylen, Wtable_daily[X])), sl.value) , color = RGBAf0(0,0,1,0.5));
-cbar[1] = layout[3:5, 4] = LColorbar(scene, width = 20, limits = (0, 1), label = "SWC");
+cbar[1] = layout[2, 1:3] = LColorbar(scene, height = 20, limits = (0, 1), label = "SWC", colormap = :lighttest, vertical = false, labelpadding = -5);
 
-ax3D[2] = layout[2:5, 5:7] = LRect(scene, visible = false);
+ax3D[2] = layout[2:5, 5:8] = LRect(scene, visible = false);
 scene3D_2 = Scene(scene, lift(IRect2D, ax3D[2].layoutnodes.computedbbox), camera = cam3d!, raw = false, show_axis = true);
 surface!(scene3D_2, 0:7, 0:7, elev, color = lift(X-> GLMakie.vec2color(Matrix(sparse(x, y, Tsoil_daily[X,:])), Reverse(:lighttest), (0,1)), sl.value), shading = false, limits = Rect(0, 0, 0, 7, 7, 2));
 x_or = [0,0,0]; Ylen = 7; Zlen = 1; Xlen = 7;
 mesh!(scene3D_2, lift(X-> HyperRectangle(Vec3f0(x_or), Vec3f0(Xlen, Ylen, Wtable_daily[X])), sl.value) , color = RGBAf0(0,0,1,0.5));	
-cbar[2] = layout[3:5, 8] = LColorbar(scene, width = 20, limits = (0, 1), label = "Tsoil");
+cbar[2] = layout[2, 5:7] = LColorbar(scene, height = 20, limits = (0, 1), label = "Tsoil", colormap = :lighttest, vertical = false, labelpadding = -5);
 
-ax3D[3] = layout[2:5, 9:11] = LRect(scene, visible = false);
+ax3D[3] = layout[2:5, 9:12] = LRect(scene, visible = false);
 scene3D_3 = Scene(scene, lift(IRect2D, ax3D[3].layoutnodes.computedbbox), camera = cam3d!, raw = false, show_axis = true);
 surface!(scene3D_3, 0:7, 0:7, elev, color = lift(X-> GLMakie.vec2color(Matrix(sparse(x, y, Rsoil_daily[X,:])), Reverse(:lighttest), (0,1)), sl.value), shading = false, limits = Rect(0, 0, 0, 7, 7, 2));
 x_or = [0,0,0]; Ylen = 7; Zlen = 1; Xlen = 7;
 mesh!(scene3D_3, lift(X-> HyperRectangle(Vec3f0(x_or), Vec3f0(Xlen, Ylen, Wtable_daily[X])), sl.value) , color = RGBAf0(0,0,1,0.5));	  
-cbar[3] = layout[3:5, 12] = LColorbar(scene, width = 20, limits = (0, 1), label = "Rsoil");
+cbar[3] = layout[2, 9:11] = LColorbar(scene, height = 20, limits = (0, 1), label = "Rsoil", colormap = :lighttest, vertical = false, labelpadding = -5);
 
 
 axis1 = scene3D_1[Axis]
