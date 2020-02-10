@@ -18,14 +18,8 @@ Heatmap (interpolated)
 
 |3DHeatmap|
 
-Interaction time series
-
-|Interaction|
-
 .. |Animation1| image:: ./images/Animation1.gif
 
 .. |Heatmap| image:: ./images/Heatmap.gif
 
 .. |3DHeatmap| image:: ./images/3DHeatmap.gif
-
-.. |3DHeatmap| image:: ./images/Interaction.gif
