@@ -28,4 +28,4 @@ Interaction time series
 
 .. |3DHeatmap| image:: ./images/3DHeatmap.gif
 
-.. |3DHeatmap| image:: ./images/Interaction.gif
+.. |Interaction| image:: ./images/Interaction.gif
