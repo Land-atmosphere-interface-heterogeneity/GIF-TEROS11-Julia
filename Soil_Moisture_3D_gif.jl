@@ -308,7 +308,7 @@ scene
 
 
 
-Makie.save("First_MakieLayout_Plot.png", scene)
+# Makie.save("First_MakieLayout_Plot.png", scene)
 
 # TO DO: add dates, add proper axis labels etc., add colorbar, make it interactive with sliders and buttons
 # add the time series plots (rain, SWC, Tsoil)
