@@ -100,15 +100,14 @@ end
 # Need same datetime (daily) for SWC data and met data
 Dtime_all = collect(Date(2019, 11, 23):Day(1):today())
 n_all = length(Dtime_all)
-SWC_daily_mean = Array{Float64}(undef,n_all)
-SWC_daily_std = Array{Float64}(undef,n_all)
-SWC_daily = Array{Union{Float64,Missing}}(missing,n_all,66)
-Precip_daily = Array{Float64}(undef,n_all)
+SWC_daily_mean = Tsoil_daily_mean = SWC_daily_std = Tsoil_daily_std = Array{Float64}(undef, n_all)
+SWC_daily = Tsoil_daily = Array{Union{Float64,Missing}}(missing, n_all,66)
+Precip_daily = Array{Float64}(undef, n_all)
 for i = collect(1:n_all-1) # up to day before today, in case it's before noon
-    SWC_daily[i,:] = SWC[25+(i-1)*48,:]
-    SWC_daily_mean[i] = mean(skipmissing(SWC_daily[i,:]))
-    SWC_daily_std[i] = std(skipmissing(SWC_daily[i,:]))
-    t = findfirst(x -> x == Dtime_all[i],Dtime_met_d)
+    SWC_daily[i,:], Tsoil_daily[i, :] = SWC[25+(i-1)*48,:], Tsoil[25+(i-1)*48, :]
+    SWC_daily_mean[i], Tsoil_daily_mean[i] = mean(skipmissing(SWC_daily[i, :])), mean(skipmissing(Tsoil_daily[i, :]))
+    SWC_daily_std[i], Tsoil_daily_std[i] = std(skipmissing(SWC_daily[i, :])), std(skipmissing(Tsoil_daily[i, :]))
+    t = findfirst(x -> x == Dtime_all[i], Dtime_met_d)
     if isnothing(t) == false
         Precip_daily[i] = Precip_d[t]
     end
@@ -116,3 +115,4 @@ end
 
 # Delete Precip outliers, daily rain > 50 mm which may be calibration day... this should be fixed by Evan in the qc data!!
 Precip_daily[Precip_daily.>=50] .= 0
+
