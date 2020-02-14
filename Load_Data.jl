@@ -23,50 +23,46 @@ met_n = size(metdata,1)
 
 # Rearrange those data in 1 dataframe
 Dtime = collect(Dates.DateTime(DateTime(2019, 11, 23, 00, 00, 00)):Dates.Minute(30):now())
-Dtime = convert(DataFrame, Dict("datetime"=>Dtime))
-join(Dtime, data[1], on = :datetime)
-
-
-#=
-WORK IN PROGRESS
-=#
-
-
 m = length(Dtime)
-SWC = Array{Union{Float64,Missing}}(missing, m, 66)
-nextit = collect(0:5:5*n-1)
-for j = 1:11 # For all files
-    for i = 1:m
-	k = nextit[j]
-        t = findfirst(x -> x == Dtime[i], data[j].datetime)
-        if isnothing(t) == false
-            SWC[i,j+k] = data[j].value[t]
-            SWC[i,j+1+k] = data[j].value[t+2]
-            SWC[i,j+2+k] = data[j].value[t+4]
-            SWC[i,j+3+k] = data[j].value[t+6]
-            SWC[i,j+4+k] = data[j].value[t+8]
-            SWC[i,j+5+k] = data[j].value[t+10]
-        end
-    end
+nextit = 0:5:5*n-1
+function SWC_array(Dtime::Array{DateTime,1}, data::Array{DataFrame,1})
+	SWC = Array{Union{Float64,Missing}}(missing, m, 66)
+	for j = 1:11 # For all files
+	    for i = 1:m
+		k = nextit[j]
+		t = findfirst(x -> x == Dtime[i], data[j].datetime)
+		if isnothing(t) == false
+		    SWC[i,j+k] = data[j].value[t]
+		    SWC[i,j+1+k] = data[j].value[t+2]
+		    SWC[i,j+2+k] = data[j].value[t+4]
+		    SWC[i,j+3+k] = data[j].value[t+6]
+		    SWC[i,j+4+k] = data[j].value[t+8]
+		    SWC[i,j+5+k] = data[j].value[t+10]
+		end
+	    end
+	end
+	SWC = replace(SWC, 0.0=>missing)
 end
-SWC = replace(SWC, 0.0=>missing)
-
-Tsoil = Array{Union{Float64,Missing}}(missing, m, 66)
-for j = 1:11 # For all files
-    for i = 1:m
-	k = nextit[j]
-        t = findfirst(x -> x == Dtime[i], data[j].datetime)
-        if isnothing(t) == false
-            Tsoil[i,j+k] = data[j].value[t+1]
-            Tsoil[i,j+1+k] = data[j].value[t+3]
-            Tsoil[i,j+2+k] = data[j].value[t+5]
-            Tsoil[i,j+3+k] = data[j].value[t+7]
-            Tsoil[i,j+4+k] = data[j].value[t+9]
-            Tsoil[i,j+5+k] = data[j].value[t+11]
-        end
-    end
+SWC = SWC_array(Dtime, data)
+function Tsoil_array(Dtime::Array{DateTime,1}, data::Array{DataFrame,1})
+	Tsoil = Array{Union{Float64,Missing}}(missing, m, 66)
+	for j = 1:11 # For all files
+	    for i = 1:m
+		k = nextit[j]
+		t = findfirst(x -> x == Dtime[i], data[j].datetime)
+		if isnothing(t) == false
+		    Tsoil[i,j+k] = data[j].value[t+1]
+		    Tsoil[i,j+1+k] = data[j].value[t+3]
+		    Tsoil[i,j+2+k] = data[j].value[t+5]
+		    Tsoil[i,j+3+k] = data[j].value[t+7]
+		    Tsoil[i,j+4+k] = data[j].value[t+9]
+		    Tsoil[i,j+5+k] = data[j].value[t+11]
+		end
+	    end
+	end
+	Tsoil = replace(Tsoil, 0.0=>missing)
 end
-Tsoil = replace(Tsoil, 0.0=>missing)
+Tsoil = Tsoil_array(Dtime, data)
 
 # Load metadata (position of TEROS sensors)
 MD = CSV.read("Input\\Metadata.csv")
