@@ -18,7 +18,7 @@ data = DataFrame[]
 col_name = [:DOM,:Month,:Year,:Time,:PSC,:WD60,:WS60,:WD_STD60,:T60,:WD10,:WS10,:WD_STD10,:T10,:DPT,:RH,:TD100,:Precip,:RS,:RN,:Pressure,:WatVapPress,:TS10,:TS100,:TS10F]
 metdata = DataFrame[]
 [push!(metdata, CSV.read("Input\\MET TOWER\\"*i*"19met.data", delim=' ', header=col_name, ignorerepeated=true, datarow=1, footerskip=2)) for i in ["nov", "dec"]]
-metdata = vcat(metdata...)
+metdata = reduce(vcat, metdata)
 met_n = size(metdata,1)
 
 # Rearrange those data in 1 dataframe
