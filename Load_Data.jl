@@ -23,6 +23,15 @@ met_n = size(metdata,1)
 
 # Rearrange those data in 1 dataframe
 Dtime = collect(Dates.DateTime(DateTime(2019, 11, 23, 00, 00, 00)):Dates.Minute(30):now())
+Dtime = convert(DataFrame, Dict("datetime"=>Dtime))
+join(Dtime, data[1], on = :datetime)
+
+
+#=
+WORK IN PROGRESS
+=#
+
+
 m = length(Dtime)
 SWC = Array{Union{Float64,Missing}}(missing, m, 66)
 nextit = collect(0:5:5*n-1)
