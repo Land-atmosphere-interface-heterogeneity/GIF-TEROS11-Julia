@@ -99,3 +99,11 @@ axis3[:ticks][:ranges_labels] = (([1.0,3.0,5.0,7.0], [1.0,3.0,5.0,7.0], [1.0, 1.
 
 scene
 
+# to record some interaction
+record(scene, "images\\Interaction.gif") do io
+      for i = 1:200
+          sleep(0.05)     
+          recordframe!(io) # record a new frame
+      end
+  end
+
