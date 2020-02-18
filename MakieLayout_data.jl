@@ -60,24 +60,24 @@ cbar = Array{LColorbar}(undef,3)
 
 ax3D[1] = layout[1:7, 1:8] = LRect(scene, visible = false);
 scene3D_1 = Scene(scene, lift(IRect2D, ax3D[1].layoutnodes.computedbbox), camera = cam3d!, raw = false, show_axis = true);
-surface!(scene3D_1, 0:7, 0:7, elev, color = lift(X-> GLMakie.vec2color(Matrix(sparse(x, y, SWC_daily[X,:])), :redsblues, (0.35, 0.48)), sl.value), shading = false, limits = Rect(0, 0, 0, 7, 7, 1.5));
+surface!(scene3D_1, 0:7, 0:7, elev, color = lift(X-> GLMakie.vec2color(Matrix(sparse(x, y, SWC_daily[X,:])), Reverse(:kdc), (0.35, 0.48)), sl.value), shading = false, limits = Rect(0, 0, 0, 7, 7, 1.5));
 x_or = [0,0,0]; Ylen = 7; Zlen = 1; Xlen = 7;
 mesh!(scene3D_1, lift(X-> HyperRectangle(Vec3f0(x_or), Vec3f0(Xlen, Ylen, Wtable_daily[X])), sl.value) , color = RGBAf0(0,0,1,0.2));
-cbar[1] = layout[2, 2:7] = LColorbar(scene, height = 20, limits = (0.35, 0.48), label = "SWC", colormap = :redsblues, vertical = false, labelpadding = -5);
+cbar[1] = layout[2, 2:7] = LColorbar(scene, height = 20, limits = (0.35, 0.48), label = "SWC", colormap = Reverse(:kdc), vertical = false, labelpadding = -5);
 
 ax3D[2] = layout[1:7, 9:16] = LRect(scene, visible = false);
 scene3D_2 = Scene(scene, lift(IRect2D, ax3D[2].layoutnodes.computedbbox), camera = cam3d!, raw = false, show_axis = true);
-surface!(scene3D_2, 0:7, 0:7, elev, color = lift(X-> GLMakie.vec2color(Matrix(sparse(x, y, Tsoil_daily[X,:])), :heat, (1, 7)), sl.value), shading = false, limits = Rect(0, 0, 0, 7, 7, 1.5));
+surface!(scene3D_2, 0:7, 0:7, elev, color = lift(X-> GLMakie.vec2color(Matrix(sparse(x, y, Tsoil_daily[X,:])), :coolwarm, (1, 7)), sl.value), shading = false, limits = Rect(0, 0, 0, 7, 7, 1.5));
 x_or = [0,0,0]; Ylen = 7; Zlen = 1; Xlen = 7;
 mesh!(scene3D_2, lift(X-> HyperRectangle(Vec3f0(x_or), Vec3f0(Xlen, Ylen, Wtable_daily[X])), sl.value) , color = RGBAf0(0,0,1,0.2));	
-cbar[2] = layout[2, 10:15] = LColorbar(scene, height = 20, limits = (1, 7), label = "Tsoil", colormap = :heat, vertical = false, labelpadding = -5);
+cbar[2] = layout[2, 10:15] = LColorbar(scene, height = 20, limits = (1, 7), label = "Tsoil", colormap = :coolwarm, vertical = false, labelpadding = -5);
 
 ax3D[3] = layout[1:7, 17:24] = LRect(scene, visible = false);
 scene3D_3 = Scene(scene, lift(IRect2D, ax3D[3].layoutnodes.computedbbox), camera = cam3d!, raw = false, show_axis = true);
-surface!(scene3D_3, 0:7, 0:7, elev, color = lift(X-> GLMakie.vec2color(Matrix(sparse(x, y, Rsoil_daily[X,:])), :greens, (0.25,0.5)), sl.value), shading = false, limits = Rect(0, 0, 0, 7, 7, 1.5));
+surface!(scene3D_3, 0:7, 0:7, elev, color = lift(X-> GLMakie.vec2color(Matrix(sparse(x, y, Rsoil_daily[X,:])), :viridis, (0.25,0.5)), sl.value), shading = false, limits = Rect(0, 0, 0, 7, 7, 1.5));
 x_or = [0,0,0]; Ylen = 7; Zlen = 1; Xlen = 7;
 mesh!(scene3D_3, lift(X-> HyperRectangle(Vec3f0(x_or), Vec3f0(Xlen, Ylen, Wtable_daily[X])), sl.value) , color = RGBAf0(0,0,1,0.2));	  
-cbar[3] = layout[2, 18:23] = LColorbar(scene, height = 20, limits = (0.25, 0.5), label = "Rsoil", colormap = :greens, vertical = false, labelpadding = -5);
+cbar[3] = layout[2, 18:23] = LColorbar(scene, height = 20, limits = (0.25, 0.5), label = "Rsoil", colormap = :viridis, vertical = false, labelpadding = -5);
 
 axis1 = scene3D_1[Axis]
 axis1.names.axisnames = ("Coordinate x (m)","Coordinate y (m)","z")
