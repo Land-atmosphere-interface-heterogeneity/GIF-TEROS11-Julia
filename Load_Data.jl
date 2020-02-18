@@ -1,7 +1,7 @@
 # Load Packages
 using CSV, DataFrames, Dates, Statistics
 # Set working directory
-cd("C:\\Users\\arenchon\\Documents\\GitHub\\GIF-TEROS11-Julia")
+#cd("C:\\Users\\arenchon\\Documents\\GitHub\\GIF-TEROS11-Julia")
 
 # Load data from TEROS input files
 function loadteros()
