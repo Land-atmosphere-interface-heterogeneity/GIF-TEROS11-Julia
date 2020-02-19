@@ -1,33 +1,28 @@
 # Load Packages
 using CSV, DataFrames, Dates, Statistics
-# Set working directory
-#cd("C:\\Users\\arenchon\\Documents\\GitHub\\GIF-TEROS11-Julia")
 
+# Functions
 # Load data from TEROS input files
-function loadteros()
-	Input_FN = readdir("Input\\TEROS\\")
+function loadteros(path::AbstractString)
+	Input_FN = readdir(path)
 	permute!(Input_FN,[3,4,5,6,7,8,9,10,11,1,2]) # need to reorder from 1 to 11
 	n = length(Input_FN) # this is the number of input files, useful later
 	data = DataFrame[]
-	[push!(data, CSV.read("Input\\TEROS\\"*Input_FN[i], dateformat="yyyy-mm-dd HH:MM:SS+00:00")) for i in 1:n]
+	[push!(data, CSV.read(joinpath(path, Input_FN[i]), dateformat="yyyy-mm-dd HH:MM:SS+00:00")) for i in 1:n]
 	return data
 end
-data = loadteros();
-
-# Download met data
-[download("http://www.atmos.anl.gov/ANLMET/numeric/2019/"*i*"19met.data", "Input\\MET TOWER\\"*i*"19met.data") for i in ["nov", "dec"]]
-# Load that met data
-function loadmet()
+# Download and load met data
+function loadmet(path::AbstractString)
+        [download("http://www.atmos.anl.gov/ANLMET/numeric/2019/"*i*"19met.data", joinpath(path, i*"19met.data")) for i in ["nov", "dec"]];
 	col_name = [:DOM,:Month,:Year,:Time,:PSC,:WD60,:WS60,:WD_STD60,:T60,:WD10,:WS10,:WD_STD10,:T10,:DPT,:RH,:TD100,:Precip,:RS,:RN,:Pressure,:WatVapPress,:TS10,:TS100,:TS10F]
 	metdata = DataFrame[]
-	[push!(metdata, CSV.read("Input\\MET TOWER\\"*i*"19met.data", delim=' ', header=col_name, ignorerepeated=true, datarow=1, footerskip=2)) for i in ["nov", "dec"]]
+	[push!(metdata, CSV.read(joinpath(path, i*"19met.data"), delim=' ', header=col_name, ignorerepeated=true, datarow=1, footerskip=2)) for i in ["nov", "dec"]]
 	metdata = reduce(vcat, metdata)
+	return metdata
 end
-metdata = loadmet();
-
 # Load metadata (position of TEROS sensors)
-function loadmeta()
-	MD = CSV.read("Input\\Metadata.csv")
+function loadmeta(path::AbstractString)
+	MD = CSV.read(path)
 	x = MD.x*12.5
 	y = MD.y*12.5
 	x = x[1:end .!= 35]; x = x[1:end .!= 35]
@@ -36,10 +31,6 @@ function loadmeta()
 	y = convert(Array{Float64,1}, y)
 	return x, y
 end
-x, y = loadmeta();
-
-Dtime = collect(Dates.DateTime(DateTime(2019, 11, 23, 00, 00, 00)):Dates.Minute(30):now());
-
 # Rearrange SWC and Tsoil
 function loadSWC(data::Array{DataFrame,1}, Dtime::Array{DateTime,1})
 	m = length(Dtime); n = 11 # 11 files, for 11 ZL6 datalogger
@@ -63,8 +54,6 @@ function loadSWC(data::Array{DataFrame,1}, Dtime::Array{DateTime,1})
 	SWC = SWC[:, 1:size(SWC, 2) .!= 35]; SWC = SWC[:, 1:size(SWC, 2) .!= 35] # Need to find how to delete 35 and 36 simultaneously
 	return SWC
 end
-SWC = loadSWC(data, Dtime);
-
 function loadTsoil(data::Array{DataFrame,1}, Dtime::Array{DateTime,1})
         m = length(Dtime); n = 11
 	Tsoil = Array{Union{Float64,Missing}}(missing, m, 66)
@@ -87,8 +76,6 @@ function loadTsoil(data::Array{DataFrame,1}, Dtime::Array{DateTime,1})
 	Tsoil = Tsoil[:, 1:size(Tsoil, 2) .!= 35]; Tsoil = Tsoil[:, 1:size(Tsoil, 2) .!= 35] # Need to find how to delete 35 and 36 simultaneously
 	return Tsoil
 end
-Tsoil = loadTsoil(data, Dtime);
-
 # Create a DateTime vector from metdata Month, Year and Time
 # First, need 4-digits Array for Time
 function loadDtimemet(metdata::DataFrame)
@@ -110,8 +97,6 @@ function loadDtimemet(metdata::DataFrame)
 	end
 	return Dtime_met
 end
-Dtime_met = loadDtimemet(metdata);
-
 # Integrate daily Precip
 # I need to redo this... this is not clean. Maybe fixing latest rain on ANLMET website should be done first. 
 function PrecipD(metdata::DataFrame, Dtime_met::Array{DateTime,1})
@@ -129,22 +114,14 @@ function PrecipD(metdata::DataFrame, Dtime_met::Array{DateTime,1})
 	end
 	return Precip_d, Dtime_met_d
 end
-Precip_d, Dtime_met_d = PrecipD(metdata, Dtime_met);
-
-# Need same datetime (daily) for SWC data and met data
-Dtime_all = collect(Date(2019, 11, 23):Day(1):today());
-
 function dailyval(X::Array{Union{Missing, Float64},2})
 	n_all = length(Dtime_all)
-	X_daily = [X[25+(i-1)*48, :] for i in 1:n_all]
+	X_daily = [X[15+(i-1)*48, :] for i in 1:n_all]
 	X_daily = reduce(vcat, adjoint.(X_daily))		   
-	X_daily_mean = [mean(X_daily[i,:]) for i = 1:n_all]
-	X_daily_std = [std(X_daily[i,:]) for i = 1:n_all]	   
+	X_daily_mean = [mean(skipmissing(X_daily[i,:])) for i = 1:n_all]
+	X_daily_std = [std(skipmissing(X_daily[i,:])) for i = 1:n_all]	   
 	return X_daily, X_daily_mean, X_daily_std
 end
-Tsoil_daily, Tsoil_daily_mean, Tsoil_daily_std = dailyval(Tsoil);
-SWC_daily, SWC_daily_mean, SWC_daily_std = dailyval(SWC);
-
 function Precipdaily(Precip_d::Array{Float64,1})
 	n_all = length(Dtime_all)
 	Precip_daily = Array{Float64}(undef, n_all)
@@ -154,9 +131,21 @@ function Precipdaily(Precip_d::Array{Float64,1})
 		Precip_daily[i] = Precip_d[t]
 	    end
 	end
-        # Delete Precip outliers, daily rain > 50 mm which may be calibration day... this should be fixed by Evan in the qc data!!
-        Precip_daily[Precip_daily.>=50] .= 0
+        Precip_daily[Precip_daily.>=50] .= 0 # Delete Precip outliers, daily rain > 50 mm which may be calibration day... this should be fixed by Evan in the qc data!!
 	return Precip_daily
 end
+
+# Script
+data = loadteros("Input\\TEROS\\");
+metdata = loadmet("Input\\MET TOWER\\");
+x, y = loadmeta("Input\\Metadata.csv");
+Dtime = collect(Dates.DateTime(DateTime(2019, 11, 23, 00, 00, 00)):Dates.Minute(30):now());
+SWC = loadSWC(data, Dtime);
+Tsoil = loadTsoil(data, Dtime);
+Dtime_met = loadDtimemet(metdata);
+Precip_d, Dtime_met_d = PrecipD(metdata, Dtime_met);
+Dtime_all = collect(Date(2019, 11, 23):Day(1):today()); # Need same datetime (daily) for SWC data and met data
+Tsoil_daily, Tsoil_daily_mean, Tsoil_daily_std = dailyval(Tsoil);
+SWC_daily, SWC_daily_mean, SWC_daily_std = dailyval(SWC);
 Precip_daily = Precipdaily(Precip_d);
 
