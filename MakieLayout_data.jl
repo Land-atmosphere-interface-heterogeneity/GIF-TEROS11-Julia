@@ -1,9 +1,23 @@
-include("Load_Data.jl"); # Currently, @time ~20 sec first run, ~4 sec next runs. Could be improved!
 include("DAMM.jl");
 include("DAMM_param.jl");
 
 using Makie, MakieLayout, Dates, GLMakie, GeometryTypes, SparseArrays
 using PlotUtils: optimize_ticks
+
+# Load Data
+include("Load_Data.jl"); 
+data = loadteros("Input\\TEROS\\");
+metdata = loadmet("Input\\MET TOWER\\");
+x, y = loadmeta("Input\\Metadata.csv");
+Dtime = collect(Dates.DateTime(DateTime(2019, 11, 23, 00, 00, 00)):Dates.Minute(30):now());
+SWC = loadSWC(data, Dtime);
+Tsoil = loadTsoil(data, Dtime);
+Dtime_met = loadDtimemet(metdata);
+Precip_d, Dtime_met_d = PrecipD(metdata, Dtime_met);
+Dtime_all = collect(Date(2019, 11, 23):Day(1):today()); # Need same datetime (daily) for SWC data and met data
+Tsoil_daily, Tsoil_daily_mean, Tsoil_daily_std = dailyval(Tsoil);
+SWC_daily, SWC_daily_mean, SWC_daily_std = dailyval(SWC);
+Precip_daily = Precipdaily(Precip_d);
 
 # Until I figure how to deal with missing data 
 SWC_daily = replace(SWC_daily, missing=>0.0); SWC_daily_mean = replace(SWC_daily_mean, missing=>0.0); SWC_daily_std = replace(SWC_daily_std, missing=>0.0);
