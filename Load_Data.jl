@@ -10,7 +10,7 @@ function loadteros(path::AbstractString)
 	data = DataFrame[]
 	[push!(data, CSV.read(joinpath(path, Input_FN[i]), dateformat="yyyy-mm-dd HH:MM:SS+00:00")) for i in 1:n]
 	return data
-end
+end;
 # Download and load met data
 function loadmet(path::AbstractString)
         [download("http://www.atmos.anl.gov/ANLMET/numeric/2019/"*i*"19met.data", joinpath(path, i*"19met.data")) for i in ["nov", "dec"]];
@@ -19,7 +19,7 @@ function loadmet(path::AbstractString)
 	[push!(metdata, CSV.read(joinpath(path, i*"19met.data"), delim=' ', header=col_name, ignorerepeated=true, datarow=1, footerskip=2)) for i in ["nov", "dec"]]
 	metdata = reduce(vcat, metdata)
 	return metdata
-end
+end;
 # Load metadata (position of TEROS sensors)
 function loadmeta(path::AbstractString)
 	MD = CSV.read(path)
@@ -30,7 +30,7 @@ function loadmeta(path::AbstractString)
 	x = convert(Array{Float64,1}, x)
 	y = convert(Array{Float64,1}, y)
 	return x, y
-end
+end;
 # Rearrange SWC and Tsoil
 function loadSWC(data::Array{DataFrame,1}, Dtime::Array{DateTime,1})
 	m = length(Dtime); n = 11 # 11 files, for 11 ZL6 datalogger
@@ -53,7 +53,7 @@ function loadSWC(data::Array{DataFrame,1}, Dtime::Array{DateTime,1})
 	SWC = replace(SWC, 0.0=>missing)
 	SWC = SWC[:, 1:size(SWC, 2) .!= 35]; SWC = SWC[:, 1:size(SWC, 2) .!= 35] # Need to find how to delete 35 and 36 simultaneously
 	return SWC
-end
+end;
 function loadTsoil(data::Array{DataFrame,1}, Dtime::Array{DateTime,1})
         m = length(Dtime); n = 11
 	Tsoil = Array{Union{Float64,Missing}}(missing, m, 66)
@@ -75,7 +75,7 @@ function loadTsoil(data::Array{DataFrame,1}, Dtime::Array{DateTime,1})
 	Tsoil = replace(Tsoil, 0.0=>missing)
 	Tsoil = Tsoil[:, 1:size(Tsoil, 2) .!= 35]; Tsoil = Tsoil[:, 1:size(Tsoil, 2) .!= 35] # Need to find how to delete 35 and 36 simultaneously
 	return Tsoil
-end
+end;
 # Create a DateTime vector from metdata Month, Year and Time
 # First, need 4-digits Array for Time
 function loadDtimemet(metdata::DataFrame)
@@ -96,7 +96,7 @@ function loadDtimemet(metdata::DataFrame)
 	    Dtime_met[i] = DateTime(metdata.Year[i]+2000,metdata.Month[i],metdata.DOM[i],parse(Int64,metdata_time_str[i][1:2]),parse(Int64,metdata_time_str[i][3:4]))
 	end
 	return Dtime_met
-end
+end;
 # Integrate daily Precip
 # I need to redo this... this is not clean. Maybe fixing latest rain on ANLMET website should be done first. 
 function PrecipD(metdata::DataFrame, Dtime_met::Array{DateTime,1})
@@ -113,16 +113,16 @@ function PrecipD(metdata::DataFrame, Dtime_met::Array{DateTime,1})
 	    Dtime_met_d[30 + i] = Date(DateTime(2019,12, i))
 	end
 	return Precip_d, Dtime_met_d
-end
-function dailyval(X::Array{Union{Missing, Float64},2})
+end;
+function dailyval(X::Array{Union{Missing, Float64},2}, Dtime_all::Array{Date,1})
 	n_all = length(Dtime_all)
 	X_daily = [X[15+(i-1)*48, :] for i in 1:n_all]
 	X_daily = reduce(vcat, adjoint.(X_daily))		   
 	X_daily_mean = [mean(skipmissing(X_daily[i,:])) for i = 1:n_all]
 	X_daily_std = [std(skipmissing(X_daily[i,:])) for i = 1:n_all]	   
 	return X_daily, X_daily_mean, X_daily_std
-end
-function Precipdaily(Precip_d::Array{Float64,1})
+end;
+function Precipdaily(Precip_d::Array{Float64,1}, Dtime_all::Array{Date,1}, Dtime_met_d::Array{DateTime,1})
 	n_all = length(Dtime_all)
 	Precip_daily = Array{Float64}(undef, n_all)
 	for i = 1:n_all-1 # up to day before today, in case it's before noon
@@ -133,6 +133,5 @@ function Precipdaily(Precip_d::Array{Float64,1})
 	end
         Precip_daily[Precip_daily.>=50] .= 0 # Delete Precip outliers, daily rain > 50 mm which may be calibration day... this should be fixed by Evan in the qc data!!
 	return Precip_daily
-end
-
-# Example of grabbing data in MakieLayout_data.jl
+end;
+# Example of grabbing data in MakieLayout_data_2D.jl
