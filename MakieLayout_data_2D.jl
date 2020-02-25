@@ -48,30 +48,30 @@ Rsoil_daily_mean = [mean(Rsoil_daily[i,:]) for i = 1:n_all];
 Rsoil_daily_std = [std(Rsoil_daily[i,:]) for i = 1:n_all];
 
 # Create Scene and 2D axis
-scene, layout = layoutscene(6, 3, 30, resolution = (900, 900));
+scene, layout = layoutscene(6, 3, 10, resolution = (900, 900));
 ax = Array{LAxis}(undef,7);
 sl = layout[6, 1:3] = LSlider(scene, range=1:n_all);
 Text_date = layout[1,1:3] = LText(scene, text= lift(X->Dates.format(Data.Dtime_all[X], "e, dd u yyyy"), sl.value), textsize=40);
 
-ax[1] = layout[5, 1:3] = LAxis(scene, ylabel = "Precip (mm)", yaxisposition = :right, xticklabelsvisible = false, xticksvisible = false, ylabelpadding = -10, xgridvisible = false, ygridvisible = false, yticklabelalign = (:left, :center));
+ax[1] = layout[5, 1:3] = LAxis(scene, ylabel = "Precip (mm)", yaxisposition = :right, xticklabelsvisible = false, xticksvisible = false, ylabelpadding = 15, xgridvisible = false, ygridvisible = false, yticklabelalign = (:left, :center));
 precipbar = barplot!(ax[1], Data.Dtime_all_rata[1:end], Data.Precip_daily[1:end], color = :blue);
 scatter!(ax[1], lift(X-> [Point2f0(Data.Dtime_all_rata[X], 0)], sl.value), marker = :vline, markersize = Vec2f0(0.5, 100), color = :black);
 xlims!(ax[1], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[1], (0, 40));
 
-ax[2] = layout[5, 1:3] = LAxis(scene, ylabel = "SWC (m"*to_superscript(3)*" m"*to_superscript(-3)*")", xlabel="Date", ylabelpadding = 10);
+ax[2] = layout[5, 1:3] = LAxis(scene, ylabel = "SWC (m"*to_superscript(3)*" m"*to_superscript(-3)*")", xlabel="Date", ylabelpadding = 15);
 lines!(ax[2], Data.Dtime_all_rata[1:end], Data.SWC_daily_mean[1:end], color = :blue, linewidth = 2);
 band!(ax[2], Data.Dtime_all_rata[1:end], Data.SWC_daily_mean[1:end] + Data.SWC_daily_std[1:end], Data.SWC_daily_mean[1:end] - Data.SWC_daily_std[1:end], color = color = RGBAf0(0,0,1,0.3));
 xlims!(ax[2], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[2], (0.36, 0.46));
 ax[2].xticks[] = ManualTicks(datetime2rata.(Data.dateticks) , Dates.format.(Data.dateticks, "yyyy-mm-dd"));
 
-ax[3] = layout[4, 1:3] = LAxis(scene, ylabel="Tsoil (°C)", ylabelpadding = 10, xticklabelsvisible = false, xticksvisible = false);
+ax[3] = layout[4, 1:3] = LAxis(scene, ylabel="Tsoil (°C)", ylabelpadding = 15, xticklabelsvisible = false, xticksvisible = false);
 lines!(ax[3], Data.Dtime_all_rata[1:end], Data.Tsoil_daily_mean[1:end], color = :red, linewidth = 2);
 band!(ax[3], Data.Dtime_all_rata[1:end], Data.Tsoil_daily_mean[1:end] + Data.Tsoil_daily_std[1:end], Data.Tsoil_daily_mean[1:end] - Data.Tsoil_daily_std[1:end], color = RGBAf0(1,0,0,0.3));
 scatter!(ax[3], lift(X-> [Point2f0(Data.Dtime_all_rata[X], 0)], sl.value), marker = :vline, markersize = Vec2f0(0.5,50), color = :black);
 xlims!(ax[3], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end]));
 ax[3].xticks[] = ManualTicks(datetime2rata.(Data.dateticks) , Dates.format.(Data.dateticks, "yyyy-mm-dd"));
 
-ax[4] = layout[4, 1:3] = LAxis(scene, ylabel = to_latex("Rsoil (\\mumol m^2 s^{-1})"), xticklabelsvisible = false, xticksvisible = false, xgridvisible = false, ygridvisible = false, yaxisposition = :right, ylabelpadding = -10, yticklabelalign = (:left, :center));
+ax[4] = layout[4, 1:3] = LAxis(scene, ylabel = to_latex("Rsoil (\\mumol m^{-2} s^{-1})"), xticklabelsvisible = false, xticksvisible = false, xgridvisible = false, ygridvisible = false, yaxisposition = :right, ylabelpadding = 15, yticklabelalign = (:left, :center));
 lines!(ax[4], Data.Dtime_all_rata[1:end], Rsoil_daily_mean[1:end], color = :black);
 band!(ax[4], Data.Dtime_all_rata[1:end], Rsoil_daily_mean[1:end] + Rsoil_daily_std[1:end], Rsoil_daily_mean[1:end] - Rsoil_daily_std[1:end], color = color = RGBAf0(0,0,0,0.3));
 xlims!(ax[4], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end]));
@@ -91,7 +91,7 @@ cbar[2] = layout[2, 2] = LColorbar(scene, height = 20, limits = (1, 7), label = 
 ax[7] = layout[3, 3] = LAxis(scene, yticksvisible = false,  yticklabelsvisible = false, xticklabelsvisible = false, xticksvisible = false);
 heatmap!(ax[7], Data.x, Data.y, lift(X-> Matrix(sparse(Data.x, Data.y, Rsoil_daily[X,:])), sl.value), colormap = :viridis, colorrange = (0.25, 0.5), show_axis = false, interpolate = true);
 xlims!(ax[7], (1,8)); ylims!(ax[7], (1,8));
-cbar[3] = layout[2, 3] = LColorbar(scene, height = 20, limits = (0.25, 0.5), label = to_latex("Rsoil (\\mumol m^2 s^{-1})"), colormap = :viridis, vertical = false, labelpadding = -5);
+cbar[3] = layout[2, 3] = LColorbar(scene, height = 20, limits = (0.25, 0.5), label = to_latex("Rsoil (\\mumol m^{-2} s^{-1})"), colormap = :viridis, vertical = false, labelpadding = -5);
 
 scene
 
