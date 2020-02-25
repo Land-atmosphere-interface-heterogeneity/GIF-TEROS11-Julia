@@ -102,17 +102,22 @@ end;
 # Integrate daily Precip
 # I need to redo this... this is not clean. Maybe fixing latest rain on ANLMET website should be done first. 
 function PrecipD(metdata::DataFrame, Dtime_met::Array{DateTime,1})
-	Precip_d = Array{Float64}(undef, 61)
-	Dtime_met_d = Array{DateTime}(undef, 61)
+	Precip_d = Array{Float64}(undef, 92)
+	Dtime_met_d = Array{DateTime}(undef, 92)
 	for i = 1:30
-	    use = findall(x -> Dates.day(x) == i && Dates.month(x) == 11, Dtime_met)
+	    use = findall(x -> Dates.year(x) == 2019 && Dates.day(x) == i && Dates.month(x) == 11, Dtime_met)
 	    Precip_d[i] = sum(metdata.Precip[use])
 	    Dtime_met_d[i] = Date(DateTime(2019,11,i))
 	end
 	for i = 1:31
-	    use = findall(x -> Dates.day(x) == i && Dates.month(x) == 12, Dtime_met)
+	    use = findall(x -> Dates.year(x) == 2019 && Dates.day(x) == i && Dates.month(x) == 12, Dtime_met)
 	    Precip_d[30 + i] = sum(metdata.Precip[use])
 	    Dtime_met_d[30 + i] = Date(DateTime(2019,12, i))
+	end
+	for i = 1:31
+	    use = findall(x -> Dates.year(x) == 2020 && Dates.day(x) == i && Dates.month(x) == 1, Dtime_met)
+	    Precip_d[61 + i] = sum(metdata.Precip[use])
+	    Dtime_met_d[61 + i] = Date(DateTime(2020, 1, i))
 	end
 	return Precip_d, Dtime_met_d
 end;
