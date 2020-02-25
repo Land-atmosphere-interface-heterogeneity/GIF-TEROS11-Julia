@@ -22,6 +22,10 @@ Interaction time series
 
 |Interaction|
 
+Interaction 2D
+
+|Interaction2D|
+
 .. |Animation1| image:: ./images/Animation1.gif
 
 .. |Heatmap| image:: ./images/Heatmap.gif
@@ -29,3 +33,5 @@ Interaction time series
 .. |3DHeatmap| image:: ./images/3DHeatmap.gif
 
 .. |Interaction| image:: ./images/Interaction.gif
+
+.. |Interaction2D| image:: ./images/Interaction2D.gif
