@@ -25,6 +25,7 @@ function loaddata()
 
 	# Trick until Makie.jl can work with datetime values
 	Dtime_all_rata = datetime2rata.(Dtime_all)
+	#Dtime_rata = datetime2rata.(Dtime)
 	dateticks = optimize_ticks(Dtime_all[1],Dtime_all[end])[1]
 	x = [0,0,0,1,1,1,2,2,2,3,3,3,4,4,4,5,5,5,6,6,6,7,7,7,0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,0,0,0,1,1,1,2,2,2,3,3,3,4,4,4,5,5,5,6,6,6,7,7,7] .+ 1
 	y = [0,1,2,2,1,0,0,1,2,2,1,0,0,1,2,2,1,0,0,1,2,2,1,0,3,4,4,3,4,3,3,4,4,3,3,4,4,3,4,3,5,6,7,7,6,5,5,6,7,7,6,5,5,6,7,7,6,5,5,6,7,7,6,5] .+ 1
@@ -35,6 +36,7 @@ function loaddata()
 		Tsoil_daily = Tsoil_daily, Tsoil_daily_mean = Tsoil_daily_mean, Tsoil_daily_std = Tsoil_daily_std,
 		SWC_daily = SWC_daily, SWC_daily_mean = SWC_daily_mean, SWC_daily_std = SWC_daily_std,
 		Precip_daily = Precip_daily, Dtime_all_rata = Dtime_all_rata, dateticks = dateticks,
+		#Dtime_rata = Dtime_rata
 		)
 end;
 Data = loaddata();
@@ -81,17 +83,17 @@ cbar = Array{LColorbar}(undef,3);
 ax[5] = layout[3, 1] = LAxis(scene, ylabel = "1 Hectar", ylabelpadding = 10, xticklabelsvisible = false, xticksvisible = false, yticklabelsvisible = false, yticksvisible = false);
 heatmap!(ax[5], Data.x, Data.y, lift(X-> Matrix(sparse(Data.x, Data.y, Data.SWC_daily[X,:])), sl.value), colormap = Reverse(:kdc), colorrange = (0.35, 0.48), interpolate = true, show_axis = false);
 xlims!(ax[5], (1,8)); ylims!(ax[5], (1,8));
-cbar[1] = layout[2, 1] = LColorbar(scene, height = 20, limits = (0.35, 0.48), label = "SWC (m"*to_superscript(3)*" m"*to_superscript(-3)*")", colormap = Reverse(:kdc), vertical = false, labelpadding = -5);
+cbar[1] = layout[2, 1] = LColorbar(scene, height = 20, limits = (0.35, 0.48), label = "SWC (m"*to_superscript(3)*" m"*to_superscript(-3)*")", colormap = Reverse(:kdc), vertical = false, labelpadding = -5, ticklabelalign = (:center, :center), ticklabelpad = 15);
 
 ax[6] = layout[3, 2] = LAxis(scene, yticksvisible = false, yticklabelsvisible = false, xticklabelsvisible = false, xticksvisible = false);
-heatmap!(ax[6], Data.x, Data.y, lift(X-> Matrix(sparse(Data.x, Data.y, Data.Tsoil_daily[X,:])), sl.value), colormap = :coolwarm, colorrange = (1, 7), show_axis = false, interpolate = true);
+heatmap!(ax[6], Data.x, Data.y, lift(X-> Matrix(sparse(Data.x, Data.y, Data.Tsoil_daily[X,:])), sl.value), colormap = :fire, colorrange = (1, 7), show_axis = false, interpolate = true);
 xlims!(ax[6], (1,8)); ylims!(ax[6], (1,8));
-cbar[2] = layout[2, 2] = LColorbar(scene, height = 20, limits = (1, 7), label = "Tsoil (°C)", colormap = :coolwarm, vertical = false, labelpadding = -5);
+cbar[2] = layout[2, 2] = LColorbar(scene, height = 20, limits = (1, 7), label = "Tsoil (°C)", colormap = :fire, vertical = false, labelpadding = -5, ticklabelalign = (:center, :center), ticklabelpad = 15);
 
 ax[7] = layout[3, 3] = LAxis(scene, yticksvisible = false,  yticklabelsvisible = false, xticklabelsvisible = false, xticksvisible = false);
-heatmap!(ax[7], Data.x, Data.y, lift(X-> Matrix(sparse(Data.x, Data.y, Rsoil_daily[X,:])), sl.value), colormap = :viridis, colorrange = (0.25, 0.5), show_axis = false, interpolate = true);
+heatmap!(ax[7], Data.x, Data.y, lift(X-> Matrix(sparse(Data.x, Data.y, Rsoil_daily[X,:])), sl.value), colormap = :kgy, colorrange = (0.25, 0.5), show_axis = false, interpolate = true);
 xlims!(ax[7], (1,8)); ylims!(ax[7], (1,8));
-cbar[3] = layout[2, 3] = LColorbar(scene, height = 20, limits = (0.25, 0.5), label = to_latex("Rsoil (\\mumol m^{-2} s^{-1})"), colormap = :viridis, vertical = false, labelpadding = -5);
+cbar[3] = layout[2, 3] = LColorbar(scene, height = 20, limits = (0.25, 0.5), label = to_latex("Rsoil (\\mumol m^{-2} s^{-1})"), colormap = :kgy, vertical = false, labelpadding = -5, ticklabelalign = (:center, :center), ticklabelpad = 15);
 
 scene
 
