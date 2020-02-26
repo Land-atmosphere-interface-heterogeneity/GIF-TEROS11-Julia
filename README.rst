@@ -8,30 +8,8 @@ Sensor field of soil moisture
 
 100 by 100 m grid of 64 sensors of soil moisture and temperature 
 
-|Animation1|
-
-Heatmap (interpolated)
-
-|Heatmap|
-
-3D Heatmap (interpolated)
-
-|3DHeatmap|
-
-Interaction time series
-
-|Interaction|
-
 Interaction 2D
 
 |Interaction2D|
-
-.. |Animation1| image:: ./images/Animation1.gif
-
-.. |Heatmap| image:: ./images/Heatmap.gif
-
-.. |3DHeatmap| image:: ./images/3DHeatmap.gif
-
-.. |Interaction| image:: ./images/Interaction.gif
 
 .. |Interaction2D| image:: ./images/Interaction2D.gif
