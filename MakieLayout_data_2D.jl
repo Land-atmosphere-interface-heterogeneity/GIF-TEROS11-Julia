@@ -46,8 +46,8 @@ n_all = size(Data.SWC_daily, 1); # Below are random data, for now
 PD = 3.1; porosity = 1-BD/PD # Avoid complexe number problem DAMM
 Rsoil_daily = [DAMM.(Data.Tsoil_daily[i,:], Data.SWC_daily[i,:]) for i = 1:n_all];
 Rsoil_daily = reduce(vcat, adjoint.(Rsoil_daily));
-Rsoil_daily_mean = [mean(Rsoil_daily[i,:]) for i = 1:n_all];
-Rsoil_daily_std = [std(Rsoil_daily[i,:]) for i = 1:n_all];
+Rsoil_daily_mean = [mean(filter(x -> x > 0, Rsoil_daily[i,:])) for i = 1:n_all];
+Rsoil_daily_std = [std(filter(x -> x > 0, Rsoil_daily[i,:])) for i = 1:n_all];
 
 # Create Scene and 2D axis
 scene = Scene(resolution = (900, 900), camera=campixel!);
