@@ -1,6 +1,11 @@
 using Makie, MakieLayout, Dates, GLMakie, GeometryTypes, SparseArrays, UnicodeFun
 using PlotUtils: optimize_ticks
 
+function MakieLayout.legendelements(plot::BarPlot)
+    MakieLayout.LegendElement[PolyElement(color = plot.color, strokecolor = plot.strokecolor)]
+end
+# this is for Precip legend, won't be needed in futur version of MakieLayout
+
 include("Load_Data.jl");
 include("DAMM.jl");
 include("DAMM_param.jl");
@@ -65,30 +70,34 @@ Text_date = layout[1,1:3] = LText(scene, text= lift(X->Dates.format(Data.Dtime_a
 
 ax[1] = layout[5, 1:3] = LAxis(scene, ylabel = "Precip (mm)", yaxisposition = :right, xticklabelsvisible = false, xticksvisible = false, ylabelpadding = 15, xgridvisible = false, ygridvisible = false, yticklabelalign = (:left, :center));
 precipbar = barplot!(ax[1], Data.Dtime_all_rata[1:end], Data.Precip_daily[1:end], color = :blue, strokewidth = 2, strokecolor = :black);
-scatter!(ax[1], lift(X-> [Point2f0(Data.Dtime_all_rata[X], 0)], sl.value), marker = :vline, markersize = Vec2f0(0.5, 100), color = :black);
-xlims!(ax[1], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[1], (0, 40));
+scatter!(ax[1], lift(X-> [Point2f0(Data.Dtime_all_rata[X], 0)], sl.value), marker = :vline, markersize = Vec2f0(0.5, 200), color = :black);
+xlims!(ax[1], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[1], (0, 60));
 
-ax[2] = layout[5, 1:3] = LAxis(scene, ylabel = to_latex("\\theta (m^3 m^{-3})"), xlabel="Date", ylabelpadding = 15);
-lines!(ax[2], Data.Dtime_all_rata[1:end], Data.SWC_daily_mean[1:end], color = :blue, linewidth = 2);
-band!(ax[2], Data.Dtime_all_rata[1:end], Data.SWC_daily_mean[1:end] + Data.SWC_daily_std[1:end], Data.SWC_daily_mean[1:end] - Data.SWC_daily_std[1:end], color = color = RGBAf0(0,0,1,0.3));
-xlims!(ax[2], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[2], (0.36, 0.46));
+ax[2] = layout[5, 1:3] = LAxis(scene, ylabel = to_latex("\\theta (m^3 m^{-3})"), xlabel="Date", ylabelpadding = 15, ygridvisible = false, xgridvisible = false);
+lSWC = lines!(ax[2], Data.Dtime_all_rata[1:end], Data.SWC_daily_mean[1:end], color = :blue, linewidth = 2);
+bSWC = band!(ax[2], Data.Dtime_all_rata[1:end], Data.SWC_daily_mean[1:end] + Data.SWC_daily_std[1:end], Data.SWC_daily_mean[1:end] - Data.SWC_daily_std[1:end], color = color = RGBAf0(0,0,1,0.3));
+xlims!(ax[2], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[2], (0.36, 0.52));
 ax[2].xticks[] = ManualTicks(datetime2rata.(Data.dateticks) , Dates.format.(Data.dateticks, "yyyy-mm-dd"));
 
-ax[3] = layout[4, 1:3] = LAxis(scene, ylabel= to_latex("T_{soil} (°C)"), ylabelpadding = 15, xticklabelsvisible = false, xticksvisible = false);
+ax[3] = layout[4, 1:3] = LAxis(scene, ylabel= to_latex("T_{soil} (°C)"), ylabelpadding = 15, xticklabelsvisible = false, xticksvisible = false, ygridvisible = false, xgridvisible = false);
 lTs = lines!(ax[3], Data.Dtime_all_rata[1:end], Data.Tsoil_daily_mean[1:end], color = :red, linewidth = 2);
-band!(ax[3], Data.Dtime_all_rata[1:end], Data.Tsoil_daily_mean[1:end] + Data.Tsoil_daily_std[1:end], Data.Tsoil_daily_mean[1:end] - Data.Tsoil_daily_std[1:end], color = RGBAf0(1,0,0,0.3));
+bTs = band!(ax[3], Data.Dtime_all_rata[1:end], Data.Tsoil_daily_mean[1:end] + Data.Tsoil_daily_std[1:end], Data.Tsoil_daily_mean[1:end] - Data.Tsoil_daily_std[1:end], color = RGBAf0(1,0,0,0.3));
 scatter!(ax[3], lift(X-> [Point2f0(Data.Dtime_all_rata[X], 0)], sl.value), marker = :vline, markersize = Vec2f0(0.5,50), color = :black);
 xlims!(ax[3], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end]));
 ax[3].xticks[] = ManualTicks(datetime2rata.(Data.dateticks) , Dates.format.(Data.dateticks, "yyyy-mm-dd"));
 
 ax[4] = layout[4, 1:3] = LAxis(scene, ylabel = to_latex("R_{soil} (\\mumol m^{-2} s^{-1})"), xticklabelsvisible = false, xticksvisible = false, xgridvisible = false, ygridvisible = false, yaxisposition = :right, ylabelpadding = 15, yticklabelalign = (:left, :center));
-lRs = lines!(ax[4], Data.Dtime_all_rata[1:end], Rsoil_daily_mean[1:end], color = :black);
-band!(ax[4], Data.Dtime_all_rata[1:end], Rsoil_daily_mean[1:end] + Rsoil_daily_std[1:end], Rsoil_daily_mean[1:end] - Rsoil_daily_std[1:end], color = color = RGBAf0(0,0,0,0.3));
+lRs = lines!(ax[4], Data.Dtime_all_rata[1:end], Rsoil_daily_mean[1:end], color = :green);
+bRs = band!(ax[4], Data.Dtime_all_rata[1:end], Rsoil_daily_mean[1:end] + Rsoil_daily_std[1:end], Rsoil_daily_mean[1:end] - Rsoil_daily_std[1:end], color = color = RGBAf0(0,1,0,0.3));
 xlims!(ax[4], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end]));
 
-leg = layout[4, 1:3] = LLegend(scene, [lTs, lRs], [to_latex("T_{soil}"), to_latex("R_{soil}")];
-    width = Auto(false), height = Auto(false), halign = :right, valign = :top,
-    margin = (10, 10, 10, 10), ncols = 2, titlevisible = false);
+leg = layout[4, 1:3] = LLegend(scene; halign = :right, valign = :top, orientation = :horizontal, framevisible = false);
+push!(leg, to_latex("T_{soil} (°C)"), bTs, lTs);
+push!(leg, to_latex("R_{soil} (\\mumol m^{-2} s^{-1})"), bRs, lRs);
+
+leg2 = layout[5, 1:3] = LLegend(scene; halign = :right, valign = :top, orientation = :horizontal, framevisible = false);
+push!(leg2, to_latex("\\theta (m^3 m^{-3})"), bSWC, lSWC);
+push!(leg2, "Precip (mm)", precipbar);
 
 cbar = Array{LColorbar}(undef,3);
 
