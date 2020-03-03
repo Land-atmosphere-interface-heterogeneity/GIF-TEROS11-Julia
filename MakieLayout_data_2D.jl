@@ -64,7 +64,7 @@ sl = layout[6, 1:3] = LSlider(scene, range=1:n_all);
 Text_date = layout[1,1:3] = LText(scene, text= lift(X->Dates.format(Data.Dtime_all[X], "e, dd u yyyy"), sl.value), textsize=40);
 
 ax[1] = layout[5, 1:3] = LAxis(scene, ylabel = "Precip (mm)", yaxisposition = :right, xticklabelsvisible = false, xticksvisible = false, ylabelpadding = 15, xgridvisible = false, ygridvisible = false, yticklabelalign = (:left, :center));
-precipbar = barplot!(ax[1], Data.Dtime_all_rata[1:end], Data.Precip_daily[1:end], color = :blue);
+precipbar = barplot!(ax[1], Data.Dtime_all_rata[1:end], Data.Precip_daily[1:end], color = :blue, strokewidth = 2, strokecolor = :black);
 scatter!(ax[1], lift(X-> [Point2f0(Data.Dtime_all_rata[X], 0)], sl.value), marker = :vline, markersize = Vec2f0(0.5, 100), color = :black);
 xlims!(ax[1], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[1], (0, 40));
 
