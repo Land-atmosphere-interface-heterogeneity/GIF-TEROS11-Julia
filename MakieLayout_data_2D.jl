@@ -119,8 +119,8 @@ cbar[3] = layout[2, 3] = LColorbar(scene, height = 20, limits = (0.25, 0.5), lab
 scene
 
 # to record some interaction
-# record(scene, "images\\Interaction2D.gif") do io
-#      for i = 1:100
+# record(scene, "images\\Interaction2D.mp4") do io
+#      for i = 1:200
 #          sleep(0.1)     
 #          recordframe!(io) # record a new frame
 #      end
