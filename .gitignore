@@ -1,28 +1,7 @@
 # ignore input and output files
 Output/
 Input/
-Soil_Moisture_3D_gif.jl~
-.Soil_Moisture_3D_gif.jl.un~
-WIP_3Dmap_watertable_flux.jl~
-.WIP_3Dmap_watertable_flux.jl.un~
-.Soil_Moisture_3D_gif.jl.swp
-.MakieLayout_dummy.jl.un~
-MakieLayout_dummy.jl~
-.MakieLayout_dummy.jl.swp
-.Testing_WGL.jl.un~
-Testing_WGL.jl~
-.Testing_WGL.jl.swp
-README.rst~
-.README.rst.un~
-Load_Data.jl~
-.Load_Data.jl.swp
-.Load_Data.jl.un~
-MakieLayout_data.jl~
-.MakieLayout_data.jl.swp
-.MakieLayout_data.jl.un~
-DAMM.jl~
-.DAMM.jl.swp
-.DAMM.jl.un~
-MakieLayout_data_2D.jl~
-.MakieLayout_data_2D.jl.swp
-.MakieLayout_data_2D.jl.un~
+
+# ignore VIM temp files
+*~
+*swp
