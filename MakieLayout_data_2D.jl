@@ -65,7 +65,9 @@ Rsoil_HH_std = [std(filter(x -> x > 0, Rsoil_HH[i,:])) for i = 1:n];
 
 # Could put this in Load_Data.jl
 SWC_mean = [mean(skipmissing(Data.SWC[i,:])) for i = 1:size(Data.SWC,1)];
+SWC_std = [std(skipmissing(Data.SWC[i,:])) for i = 1:size(Data.SWC,1)];
 Tsoil_mean = [mean(skipmissing(Data.Tsoil[i,:])) for i = 1:size(Data.Tsoil,1)];
+Tsoil_std = [std(skipmissing(Data.Tsoil[i,:])) for i = 1:size(Data.Tsoil,1)];
 #Rsoil_mean = [mean(skipmissing(Data.SWC[i,:])) for i = 1:size(Data.SWC,1)]
 
 # Create Scene and 2D axis
@@ -102,7 +104,7 @@ ax[3].xticks[] = ManualTicks(datetime2rata.(Data.dateticks) , Dates.format.(Data
 
 ax[4] = layout[4, 1:2] = LAxis(scene, xticklabelsvisible = false, xticksvisible = false, xgridvisible = false, ygridvisible = false, yaxisposition = :right, ylabelpadding = 15, yticklabelalign = (:left, :center), yticklabelsvisible = false, yticksvisible = false);
 lRs = lines!(ax[4], Data.Dtime_all_rata[1:end], Rsoil_daily_mean[1:end], color = :green);
-bRs = band!(ax[4], Data.Dtime_all_rata[1:end], Rsoil_daily_mean[1:end] + Rsoil_daily_std[1:end], Rsoil_daily_mean[1:end] - Rsoil_daily_std[1:end], color = color = RGBAf0(0,1,0,0.3));
+bRs = band!(ax[4], Data.Dtime_all_rata[1:end], Rsoil_daily_mean[1:end] + Rsoil_daily_std[1:end], Rsoil_daily_mean[1:end] - Rsoil_daily_std[1:end], color = RGBAf0(0,1,0,0.3));
 xlims!(ax[4], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[4], (0.25, 0.6));
 
 leg = layout[4, 1:2] = LLegend(scene; halign = :right, valign = :top, orientation = :horizontal, framevisible = false);
@@ -115,6 +117,7 @@ push!(leg2, "Precip (mm)", precipbar);
 
 ax[8] = layout[5, 3] = LAxis(scene, xlabel = "Half-hour", yticklabelsvisible = false, yticksvisible = false, xgridvisible = false, ygridvisible = false);
 lines!(ax[8], 1:48, lift(X-> SWC_mean[1+(X-1)*48:X*48], sl.value), color = :blue);
+band!(ax[8], 1:48, lift(X-> SWC_mean[1+(X-1)*48:X*48] + SWC_std[1+(X-1)*48:X*48], sl.value), lift(X->SWC_mean[1+(X-1)*48:X*48] - SWC_std[1+(X-1)*48:X*48], sl.value), color = RGBAf0(0,0,1,0.3));
 ylims!(ax[8], (0.36, 0.52)); xlims!(ax[8], (1, 48));
 
 ax[10] = layout[5, 3] = LAxis(scene, ylabel = "Precip (mm)", xticklabelsvisible = false, xticksvisible = false, yticklabelsvisible = true, yticksvisible = true, yaxisposition = :right, ylabelpadding = 15, yticklabelalign = (:left, :center), xgridvisible = false, ygridvisible = false);
@@ -123,10 +126,12 @@ ylims!(ax[10], (0, 60)); xlims!(ax[8], (1, 48));
 
 ax[9] = layout[4, 3] = LAxis(scene, xticklabelsvisible = false, xticksvisible = false, yticklabelsvisible = false, yticksvisible = false, xgridvisible = false, ygridvisible = false);
 lines!(ax[9], 1:48, lift(X-> Tsoil_mean[1+(X-1)*48:X*48], sl.value), color = :red);
+band!(ax[9], 1:48, lift(X-> Tsoil_mean[1+(X-1)*48:X*48] + Tsoil_std[1+(X-1)*48:X*48], sl.value), lift(X->Tsoil_mean[1+(X-1)*48:X*48] - Tsoil_std[1+(X-1)*48:X*48], sl.value), color = RGBAf0(1,0,0,0.3));
 ylims!(ax[9], (0, 7)); xlims!(ax[9], (1, 48));
 
 ax[11] = layout[4, 3] = LAxis(scene, ylabel = to_latex("R_{soil} (\\mumol m^{-2} s^{-1})"), xticklabelsvisible = false, xticksvisible = false, yticklabelsvisible = true, yticksvisible = true, yaxisposition = :right, ylabelpadding = 15, yticklabelalign = (:left, :center), xgridvisible = false, ygridvisible = false); 
 lines!(ax[11], 1:48, lift(X-> Rsoil_HH_mean[1+(X-1)*48:X*48], sl.value), color = :green);
+band!(ax[11], 1:48, lift(X-> Rsoil_HH_mean[1+(X-1)*48:X*48] + Rsoil_HH_std[1+(X-1)*48:X*48], sl.value), lift(X-> Rsoil_HH_mean[1+(X-1)*48:X*48] - Rsoil_HH_std[1+(X-1)*48:X*48], sl.value), color = RGBAf0(0,1,0,0.3));
 ylims!(ax[11], (0.25, 0.6)); xlims!(ax[11], (1, 48));
 
 cbar = Array{LColorbar}(undef,3);
@@ -169,6 +174,6 @@ ylims!(ax[10], (0, 60)); xlims!(ax[8], (1, 48));
 ylims!(ax[11], (0.25, 0.6)); xlims!(ax[11], (1, 48));
 
 
-
+# Note: interactive figure crash in February because no precip data in february. Easy fix. 
 
 
