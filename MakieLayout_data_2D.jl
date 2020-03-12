@@ -153,14 +153,6 @@ cbar[3] = layout[2, 3] = LColorbar(scene, height = 20, limits = (0.25, 0.6), lab
 
 scene
 
-# to record some interaction
-# record(scene, "images\\Interaction2D.mp4") do io
-#      for i = 1:200
-#          sleep(0.1)     
-#          recordframe!(io) # record a new frame
-#      end
-#  end
-
 xlims!(ax[1], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[1], (0, 60));
 xlims!(ax[2], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[2], (0.36, 0.52));
 xlims!(ax[3], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[3], (0, 7));
@@ -172,6 +164,14 @@ ylims!(ax[8], (0.36, 0.52)); xlims!(ax[8], (1, 48));
 ylims!(ax[9], (0, 7)); xlims!(ax[9], (1, 48));
 ylims!(ax[10], (0, 60)); xlims!(ax[8], (1, 48));
 ylims!(ax[11], (0.25, 0.6)); xlims!(ax[11], (1, 48));
+
+# to record some interaction
+# record(scene, "images\\Interaction2D.gif") do io
+#      for i = 1:200
+#          sleep(0.1)     
+#          recordframe!(io) # record a new frame
+#      end
+#  end
 
 
 # Note: interactive figure crash in February because no precip data in february. Easy fix. 
