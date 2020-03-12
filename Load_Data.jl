@@ -141,18 +141,4 @@ function Precipdaily(Precip_d::Array{Float64,1}, Dtime_all::Array{Date,1}, Dtime
         Precip_daily[Precip_daily.>=50] .= 0 # Delete Precip outliers, daily rain > 50 mm which may be calibration day... this should be fixed by Evan in the qc data!!
 	return Precip_daily
 end;
-# get Precip data on same timestamp as TEROS (Dtime)
-function PrecipHH(metdata::DataFrame, Dtime::Array{DateTime,1}, Dtime_met::Array{DateTime,1})
-	n = length(Dtime)
-	n2 = length(Dtime_met) # currently Dtime_met is shorter than Dtime because of missing data. Will be fixed when Evan add year to recent data on ANLMET website
-	Precip_HH = Array{Float64}(undef, n)
-	for i = 1:n2
-		t = findfirst(x -> x == Dtime[i], Dtime_met)
-	       if isnothing(t) == false
-		       Precip_HH[i] = metdata.Precip[i]
-	       end
-	end
-	Precip_HH[Precip_HH.>=50] .= 0
-	return Precip_HH
-end;
 # Example of grabbing data in MakieLayout_data_2D.jl
