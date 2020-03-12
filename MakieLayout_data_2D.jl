@@ -23,6 +23,7 @@ function loaddata()
 	Tsoil_daily, Tsoil_daily_mean, Tsoil_daily_std = dailyval(Tsoil, Dtime_all)
 	SWC_daily, SWC_daily_mean, SWC_daily_std = dailyval(SWC, Dtime_all)
 	Precip_daily = Precipdaily(Precip_d, Dtime_all, Dtime_met_d)
+	Precip_HH = PrecipHH(metdata, Dtime, Dtime_met)
 
 	# Until I figure how to deal with missing data (in Makie.jl)
 	SWC_daily = replace(SWC_daily, missing=>0.0); SWC_daily_mean = replace(SWC_daily_mean, missing=>0.0); SWC_daily_std = replace(SWC_daily_std, missing=>0.0)
@@ -41,7 +42,7 @@ function loaddata()
 		Tsoil_daily = Tsoil_daily, Tsoil_daily_mean = Tsoil_daily_mean, Tsoil_daily_std = Tsoil_daily_std,
 		SWC_daily = SWC_daily, SWC_daily_mean = SWC_daily_mean, SWC_daily_std = SWC_daily_std,
 		Precip_daily = Precip_daily, Dtime_all_rata = Dtime_all_rata, dateticks = dateticks,
-		#Dtime_rata = Dtime_rata
+		Precip_HH = Precip_HH#Dtime_rata = Dtime_rata
 		)
 end;
 Data = loaddata();
@@ -53,6 +54,15 @@ Rsoil_daily = [DAMM.(Data.Tsoil_daily[i,:], Data.SWC_daily[i,:]) for i = 1:n_all
 Rsoil_daily = reduce(vcat, adjoint.(Rsoil_daily));
 Rsoil_daily_mean = [mean(filter(x -> x > 0, Rsoil_daily[i,:])) for i = 1:n_all];
 Rsoil_daily_std = [std(filter(x -> x > 0, Rsoil_daily[i,:])) for i = 1:n_all];
+
+# Half-hourly
+SWC  = replace(Data.SWC , missing=>0.0); 
+Tsoil  = replace(Data.Tsoil , missing=>0.0); 
+n = size(Data.Dtime, 1);
+Rsoil_HH = [DAMM.(Tsoil[i,:], SWC[i,:]) for i = 1:n];
+Rsoil_HH = reduce(vcat, adjoint.(Rsoil_HH));
+Rsoil_HH_mean = [mean(filter(x -> x > 0, Rsoil_HH[i,:])) for i = 1:n];
+Rsoil_HH_std = [std(filter(x -> x > 0, Rsoil_HH[i,:])) for i = 1:n];
 
 # Could put this in Load_Data.jl
 SWC_mean = [mean(skipmissing(Data.SWC[i,:])) for i = 1:size(Data.SWC,1)];
@@ -70,11 +80,11 @@ layout = GridLayout(
 		    )
 
 #layout = layoutscene(6, 3, 10, resolution = (900, 900));
-ax = Array{LAxis}(undef, 9);
+ax = Array{LAxis}(undef, 11);
 sl = layout[6, 1:2] = LSlider(scene, range=1:n_all);
 Text_date = layout[1,1:3] = LText(scene, text= lift(X->Dates.format(Data.Dtime_all[X], "e, dd u yyyy"), sl.value), textsize=40);
 
-ax[1] = layout[5, 1:2] = LAxis(scene, ylabel = "Precip (mm)", yaxisposition = :right, xticklabelsvisible = false, xticksvisible = false, ylabelpadding = 15, xgridvisible = false, ygridvisible = false, yticklabelalign = (:left, :center));
+ax[1] = layout[5, 1:2] = LAxis(scene, yaxisposition = :right, xticklabelsvisible = false, xticksvisible = false, ylabelpadding = 15, xgridvisible = false, ygridvisible = false, yticklabelalign = (:left, :center), yticklabelsvisible = false, yticksvisible = false);
 precipbar = barplot!(ax[1], Data.Dtime_all_rata[1:end], Data.Precip_daily[1:end], color = :blue, strokewidth = 2, strokecolor = :black);
 scatter!(ax[1], lift(X-> [Point2f0(Data.Dtime_all_rata[X], 0)], sl.value), marker = :vline, markersize = Vec2f0(0.5, 200), color = :black);
 xlims!(ax[1], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[1], (0, 60));
@@ -92,7 +102,7 @@ scatter!(ax[3], lift(X-> [Point2f0(Data.Dtime_all_rata[X], 0)], sl.value), marke
 xlims!(ax[3], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end]));
 ax[3].xticks[] = ManualTicks(datetime2rata.(Data.dateticks) , Dates.format.(Data.dateticks, "yyyy-mm-dd"));
 
-ax[4] = layout[4, 1:2] = LAxis(scene, ylabel = to_latex("R_{soil} (\\mumol m^{-2} s^{-1})"), xticklabelsvisible = false, xticksvisible = false, xgridvisible = false, ygridvisible = false, yaxisposition = :right, ylabelpadding = 15, yticklabelalign = (:left, :center));
+ax[4] = layout[4, 1:2] = LAxis(scene, xticklabelsvisible = false, xticksvisible = false, xgridvisible = false, ygridvisible = false, yaxisposition = :right, ylabelpadding = 15, yticklabelalign = (:left, :center), yticklabelsvisible = false, yticksvisible = false);
 lRs = lines!(ax[4], Data.Dtime_all_rata[1:end], Rsoil_daily_mean[1:end], color = :green);
 bRs = band!(ax[4], Data.Dtime_all_rata[1:end], Rsoil_daily_mean[1:end] + Rsoil_daily_std[1:end], Rsoil_daily_mean[1:end] - Rsoil_daily_std[1:end], color = color = RGBAf0(0,1,0,0.3));
 xlims!(ax[4], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end]));
@@ -105,13 +115,21 @@ leg2 = layout[5, 1:2] = LLegend(scene; halign = :right, valign = :top, orientati
 push!(leg2, to_latex("\\theta (m^3 m^{-3})"), bSWC, lSWC);
 push!(leg2, "Precip (mm)", precipbar);
 
-ax[8] = layout[5, 3] = LAxis(scene, xlabel = "Half-hour", yticklabelsvisible = false, yticksvisible = false);
-lines!(ax[8], 1:48, lift(X-> SWC_mean[1+(X-1)*48:X*48], sl.value));
+ax[8] = layout[5, 3] = LAxis(scene, xlabel = "Half-hour", yticklabelsvisible = false, yticksvisible = false, xgridvisible = false, ygridvisible = false);
+lines!(ax[8], 1:48, lift(X-> SWC_mean[1+(X-1)*48:X*48], sl.value), color = :blue);
 ylims!(ax[8], (0.36, 0.52)); xlims!(ax[8], (1, 48));
 
-ax[9] = layout[4, 3] = LAxis(scene, xticklabelsvisible = false, xticksvisible = false, yticklabelsvisible = false, yticksvisible = false);
-lines!(ax[9], 1:48, lift(X-> Tsoil_mean[1+(X-1)*48:X*48], sl.value));
+ax[10] = layout[5, 3] = LAxis(scene, ylabel = "Precip (mm)", xticklabelsvisible = false, xticksvisible = false, yticklabelsvisible = true, yticksvisible = true, yaxisposition = :right, ylabelpadding = 15, yticklabelalign = (:left, :center), xgridvisible = false, ygridvisible = false);
+barplot!(ax[10], 1:48, lift(X-> Data.Precip_HH[1+(X-1)*48:X*48], sl.value), color = :blue, strokewidth = 2, strokecolor = :black);
+ylims!(ax[10], (0, 60)); xlims!(ax[8], (1, 48));
+
+ax[9] = layout[4, 3] = LAxis(scene, xticklabelsvisible = false, xticksvisible = false, yticklabelsvisible = false, yticksvisible = false, xgridvisible = false, ygridvisible = false);
+lines!(ax[9], 1:48, lift(X-> Tsoil_mean[1+(X-1)*48:X*48], sl.value), color = :red);
 ylims!(ax[9], (1, 7)); xlims!(ax[9], (1, 48));
+
+ax[11] = layout[4, 3] = LAxis(scene, ylabel = to_latex("R_{soil} (\\mumol m^{-2} s^{-1})"), xticklabelsvisible = false, xticksvisible = false, yticklabelsvisible = true, yticksvisible = true, yaxisposition = :right, ylabelpadding = 15, yticklabelalign = (:left, :center), xgridvisible = false, ygridvisible = false); 
+lines!(ax[11], 1:48, lift(X-> Rsoil_HH_mean[1+(X-1)*48:X*48], sl.value), color = :green);
+ylims!(ax[11], (0.25, 0.5)); xlims!(ax[9], (1, 48));
 
 cbar = Array{LColorbar}(undef,3);
 
