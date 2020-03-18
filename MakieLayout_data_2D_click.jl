@@ -73,9 +73,9 @@ Tsoil_std = [std(skipmissing(Data.Tsoil[i,:])) for i = 1:size(Data.Tsoil,1)];
 # Create Scene and 2D axis
 scene = Scene(resolution = (900, 900), camera=campixel!);
 layout = GridLayout(
-		    scene, 6, 3, 
+		    scene, 5, 3, 
 		    colsizes = [Auto(), Auto(), Auto()],
-		    rowsizes = [Fixed(50), Auto(), Auto(), Auto(), Auto(), Auto()],
+		    rowsizes = [Fixed(50), Auto(), Auto(), Auto(), Auto()],
 		    alignmode = Outside(10, 10, 10, 10)
 		    )
 
@@ -98,15 +98,20 @@ xlims!(ax[12], (1, 100));
 
 xpos = Node(1)
 
-on(ax[12].scene.events.mousebuttons) do buttons
-   if ispressed(ax[12].scene, Mouse.left)
-	   xpos[] = round(Int64, mouseposition(ax[12].scene)[1])
-   end
-   return
+#on(ax[12].scene.events.mousebuttons) do buttons
+#   if ispressed(ax[12].scene, Mouse.left)
+#	   xpos[] = round(Int64, mouseposition(ax[12].scene)[1])
+#   end
+#   return
+#end
+
+mousestate = MakieLayout.addmousestate!(ax[12].scene)
+onmouseleftdrag(mousestate) do state
+	xpos[] = round(state.pos[1])
 end
 
 
-sl = layout[6, 1:2] = LSlider(scene, range=1:n_all);
+#sl = layout[6, 1:2] = LSlider(scene, range=1:n_all);
 Text_date = layout[1,1:3] = LText(scene, text= lift(X->Dates.format(Data.Dtime_all[X], "e, dd u yyyy"), xpos), textsize=40);
 
 ax[1] = layout[5, 1:2] = LAxis(scene, yaxisposition = :right, xticklabelsvisible = false, xticksvisible = false, ylabelpadding = 15, xgridvisible = false, ygridvisible = false, yticklabelalign = (:left, :center), yticklabelsvisible = false, yticksvisible = false);
