@@ -214,4 +214,9 @@ xlims!(ax[12], (1, 100));
 # 3. Possibly, add black like contour around these 5 or 6 levels
 # 4. Make hovering colorbar highlight the heatmap, as in https://ourworldindata.org/coronavirus
 #
-# 5. Eventually, allow selection of an area by dragging mouse. Heatmap and diurnals will be average of that selection. 
+# 5. Eventually, allow selection of an area by dragging mouse. Heatmap and diurnals will be average of that selection.
+# 6. Add nightime as grey shading in the diurnal subplots, also, change half-hour to hour (midnight, 6 am, noon, 6 pm, midnight) or something
+#
+# 7. Use geomakie.jl to do interactive global maps of soil respiration, using DAMM and global data of Tsoil and SWC
+# 8. Using DAMM fitted on many dataset (from COSORE and SRDB), generate global maps of DAMM parameters (possibly using machine learning, as Sagar did for SOC)
+# 9. Use those Tsoil, SWC, DAMM params to generate more accurate global map of soil respiration (and possibly, ecosystem respiration)
