@@ -88,9 +88,13 @@ yticksvisible = false,
 xgridvisible = false,
 ygridvisible = false,
 yticklabelsvisible = false,
-xticklabelsvisible = false
+xticklabelsvisible = false,
+leftspinevisible = false,
+rightspinevisible = false
 );
-scatter!(ax[12], collect(1:n_all), collect(1:n_all));
+
+scatter!(ax[12], collect(1:n_all), collect(1:n_all), visible = false);
+xlims!(ax[12], (1, 100));
 
 xpos = Node(1)
 
@@ -185,6 +189,8 @@ ylims!(ax[8], (0.36, 0.52)); xlims!(ax[8], (1, 48));
 ylims!(ax[9], (0, 7)); xlims!(ax[9], (1, 48));
 ylims!(ax[10], (0, 60)); xlims!(ax[8], (1, 48));
 ylims!(ax[11], (0.25, 0.6)); xlims!(ax[11], (1, 48));
+xlims!(ax[12], (1, 100));
+
 
 # to record some interaction
 # record(scene, "images\\Interaction2D.gif") do io
