@@ -1,5 +1,5 @@
 from zentra.api import *; import os; import pandas as pd; import time
-os.chdir('C:\\Users\\arenchon\\Documents\\GitHub\\GIF-TEROS11-Julia\\Input\\TEROS')
+os.chdir('C:\\Users\\arenc\\Documents\\GitHub\\GIF-TEROS11-Julia\\Input\\TEROS')
 token = ZentraToken(username=os.getenv("zentra_un"),password=os.getenv("zentra_pw"))
 Device_SN = ["z6-04628","z6-04625","z6-04619","z6-04629","z6-04641","z6-04638","z6-04624","z6-04627","z6-04620","z6-04621","z6-04618"]
 i = 0
