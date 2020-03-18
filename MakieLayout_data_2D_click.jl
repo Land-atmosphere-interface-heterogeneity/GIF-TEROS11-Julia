@@ -208,4 +208,10 @@ xlims!(ax[12], (1, 100));
 
 # Note: interactive figure crash in February because no precip data in february. Easy fix. 
 
-
+# TO DO
+# 1. use recent met data to have recent precip. Missing precip data makes the plot buggy. 
+# 2. Make heatmap and colorbar discrete (5 or 6 levels?)
+# 3. Possibly, add black like contour around these 5 or 6 levels
+# 4. Make hovering colorbar highlight the heatmap, as in https://ourworldindata.org/coronavirus
+#
+# 5. Eventually, allow selection of an area by dragging mouse. Heatmap and diurnals will be average of that selection. 
