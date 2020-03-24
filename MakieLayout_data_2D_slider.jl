@@ -94,7 +94,7 @@ ax[2] = layout[5, 1:2] = LAxis(scene, ylabel = to_latex("\\theta (m^3 m^{-3})"),
 lSWC = lines!(ax[2], Data.Dtime_all_rata[1:end], Data.SWC_daily_mean[1:end], color = :blue, linewidth = 2);
 bSWC = band!(ax[2], Data.Dtime_all_rata[1:end], Data.SWC_daily_mean[1:end] + Data.SWC_daily_std[1:end], Data.SWC_daily_mean[1:end] - Data.SWC_daily_std[1:end], color = color = RGBAf0(0,0,1,0.3));
 xlims!(ax[2], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[2], (0.36, 0.52));
-ax[2].xticks[] = ManualTicks(datetime2rata.(Data.dateticks) , Dates.format.(Data.dateticks, "yyyy-mm-dd"));
+ax[2].xticks[] = ManualTicks(datetime2rata.(Data.dateticks) , Dates.format.(Data.dateticks, "yy-mm-dd"));
 
 ax[3] = layout[4, 1:2] = LAxis(scene, ylabel= to_latex("T_{soil} (°C)"), ylabelpadding = 15, xticklabelsvisible = false, xticksvisible = false, ygridvisible = false, xgridvisible = false);
 lTs = lines!(ax[3], Data.Dtime_all_rata[1:end], Data.Tsoil_daily_mean[1:end], color = :red, linewidth = 2);
@@ -102,20 +102,23 @@ bTs = band!(ax[3], Data.Dtime_all_rata[1:end], Data.Tsoil_daily_mean[1:end] + Da
 scatter!(ax[3], lift(X-> [Point2f0(Data.Dtime_all_rata[X], 0)], sl.value), marker = :vline, markersize = Vec2f0(0.5,50), color = :black);
 #lines!(ax[3], lift(X-> Point2f0[(X, 0), (X, 7)], sl.value));
 xlims!(ax[3], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[3], (0, 7));
-ax[3].xticks[] = ManualTicks(datetime2rata.(Data.dateticks) , Dates.format.(Data.dateticks, "yyyy-mm-dd"));
+ax[3].xticks[] = ManualTicks(datetime2rata.(Data.dateticks) , Dates.format.(Data.dateticks, "yy-mm-dd"));
 
 ax[4] = layout[4, 1:2] = LAxis(scene, xticklabelsvisible = false, xticksvisible = false, xgridvisible = false, ygridvisible = false, yaxisposition = :right, ylabelpadding = 15, yticklabelalign = (:left, :center), yticklabelsvisible = false, yticksvisible = false);
 lRs = lines!(ax[4], Data.Dtime_all_rata[1:end], Rsoil_daily_mean[1:end], color = :green);
 bRs = band!(ax[4], Data.Dtime_all_rata[1:end], Rsoil_daily_mean[1:end] + Rsoil_daily_std[1:end], Rsoil_daily_mean[1:end] - Rsoil_daily_std[1:end], color = RGBAf0(0,1,0,0.3));
 xlims!(ax[4], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[4], (0.25, 0.6));
 
-leg = layout[4, 1:2] = LLegend(scene; halign = :right, valign = :top, orientation = :horizontal, framevisible = false);
-push!(leg, to_latex("T_{soil} (°C)"), bTs, lTs);
-push!(leg, to_latex("R_{soil} (\\mumol m^{-2} s^{-1})"), bRs, lRs);
 
-leg2 = layout[5, 1:2] = LLegend(scene; halign = :right, valign = :top, orientation = :horizontal, framevisible = false);
-push!(leg2, to_latex("\\theta (m^3 m^{-3})"), bSWC, lSWC);
-push!(leg2, "Precip (mm)", precipbar);
+leg = layout[4, 1:2] = LLegend(scene, [[bTs, lTs], [bRs, lRs]], [to_latex("T_{soil} (°C)"), to_latex("R_{soil} (\\mumol m^{-2} s^{-1})")], halign = :right, valign = :top, orientation = :horizontal, framevisible = false);
+#LLegend(scene; halign = :right, valign = :top, orientation = :horizontal, framevisible = false);
+#push!(leg, to_latex("T_{soil} (°C)"), bTs, lTs);
+#push!(leg, to_latex("R_{soil} (\\mumol m^{-2} s^{-1})"), bRs, lRs);
+
+leg2 = layout[5, 1:2] =  LLegend(scene, [[bSWC, lSWC], precipbar], [to_latex("\\theta (m^3 m^{-3})"), "Precip (mm)"], halign = :right, valign = :top, orientation = :horizontal, framevisible = false);
+#LLegend(scene; halign = :right, valign = :top, orientation = :horizontal, framevisible = false);
+#push!(leg2, to_latex("\\theta (m^3 m^{-3})"), bSWC, lSWC);
+#push!(leg2, "Precip (mm)", precipbar);
 
 ax[8] = layout[5, 3] = LAxis(scene, xlabel = "Half-hour", yticklabelsvisible = false, yticksvisible = false, xgridvisible = false, ygridvisible = false);
 lines!(ax[8], 1:48, lift(X-> SWC_mean[1+(X-1)*48:X*48], sl.value), color = :blue);
@@ -157,15 +160,15 @@ scene
 
 xlims!(ax[1], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[1], (0, 60));
 xlims!(ax[2], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[2], (0.36, 0.52));
-xlims!(ax[3], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[3], (0, 7));
-xlims!(ax[4], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[4], (0.25, 0.6));
+xlims!(ax[3], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[3], (0, 10));
+xlims!(ax[4], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[4], (0.25, 0.8));
 xlims!(ax[5], (1,8)); ylims!(ax[5], (1,8));
 xlims!(ax[6], (1,8)); ylims!(ax[6], (1,8));
 xlims!(ax[7], (1,8)); ylims!(ax[7], (1,8));
 ylims!(ax[8], (0.36, 0.52)); xlims!(ax[8], (1, 48));
-ylims!(ax[9], (0, 7)); xlims!(ax[9], (1, 48));
+ylims!(ax[9], (0, 10)); xlims!(ax[9], (1, 48));
 ylims!(ax[10], (0, 60)); xlims!(ax[10], (1, 96));
-ylims!(ax[11], (0.25, 0.6)); xlims!(ax[11], (1, 48));
+ylims!(ax[11], (0.25, 0.8)); xlims!(ax[11], (1, 48));
 
 
 # to record some interaction
@@ -175,12 +178,10 @@ ylims!(ax[11], (0.25, 0.6)); xlims!(ax[11], (1, 48));
 #          recordframe!(io) # record a new frame
 #      end
 #  end
-
-
-# Note: interactive figure crash in February because no precip data in february. Easy fix. 
+ 
 
 # TO DO
-# 1. use recent met data to have recent precip. Missing precip data makes the plot buggy. 
+# 1. integrate 15 min precip to hourly precip 
 # 2. Make heatmap and colorbar discrete (5 or 6 levels?)
 # 3. Possibly, add black like contour around these 5 or 6 levels
 # 4. Make hovering colorbar highlight the heatmap, as in https://ourworldindata.org/coronavirus
