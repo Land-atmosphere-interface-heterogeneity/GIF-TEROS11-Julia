@@ -107,13 +107,15 @@ lRs = lines!(ax[4], Data.Dtime_all_rata[1:end], Rsoil_daily_mean[1:end], color =
 bRs = band!(ax[4], Data.Dtime_all_rata[1:end], Rsoil_daily_mean[1:end] + Rsoil_daily_std[1:end], Rsoil_daily_mean[1:end] - Rsoil_daily_std[1:end], color = RGBAf0(0,1,0,0.3));
 xlims!(ax[4], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[4], (0.25, 0.6));
 
-leg = layout[4, 1:2] = LLegend(scene; halign = :right, valign = :top, orientation = :horizontal, framevisible = false);
-push!(leg, to_latex("T_{soil} (°C)"), bTs, lTs);
-push!(leg, to_latex("R_{soil} (\\mumol m^{-2} s^{-1})"), bRs, lRs);
+leg = layout[4, 1:2] = LLegend(scene, [[bTs, lTs], [bRs, lRs]], [to_latex("T_{soil} (°C)"), to_latex("R_{soil} (\\mumol m^{-2} s^{-1})")], halign = :right, valign = :top, orientation = :horizontal, framevisible = false);
+#LLegend(scene; halign = :right, valign = :top, orientation = :horizontal, framevisible = false);
+#push!(leg, to_latex("T_{soil} (°C)"), bTs, lTs);
+#push!(leg, to_latex("R_{soil} (\\mumol m^{-2} s^{-1})"), bRs, lRs);
 
-leg2 = layout[5, 1:2] = LLegend(scene; halign = :right, valign = :top, orientation = :horizontal, framevisible = false);
-push!(leg2, to_latex("\\theta (m^3 m^{-3})"), bSWC, lSWC);
-push!(leg2, "Precip (mm)", precipbar);
+leg2 = layout[5, 1:2] =  LLegend(scene, [[bSWC, lSWC], precipbar], [to_latex("\\theta (m^3 m^{-3})"), "Precip (mm)"], halign = :right, valign = :top, orientation = :horizontal, framevisible = false);
+#LLegend(scene; halign = :right, valign = :top, orientation = :horizontal, framevisible = false);
+#push!(leg2, to_latex("\\theta (m^3 m^{-3})"), bSWC, lSWC);
+#push!(leg2, "Precip (mm)", precipbar);
 
 ax[8] = layout[5, 3] = LAxis(scene, xlabel = "Half-hour", yticklabelsvisible = false, yticksvisible = false, xgridvisible = false, ygridvisible = false);
 lines!(ax[8], 1:48, lift(X-> SWC_mean[1+(X-1)*48:X*48], sl.value), color = :blue);
@@ -155,15 +157,15 @@ scene
 
 xlims!(ax[1], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[1], (0, 60));
 xlims!(ax[2], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[2], (0.36, 0.52));
-xlims!(ax[3], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[3], (0, 7));
-xlims!(ax[4], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[4], (0.25, 0.6));
+xlims!(ax[3], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[3], (0, 10));
+xlims!(ax[4], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[4], (0.25, 0.8));
 xlims!(ax[5], (1,8)); ylims!(ax[5], (1,8));
 xlims!(ax[6], (1,8)); ylims!(ax[6], (1,8));
 xlims!(ax[7], (1,8)); ylims!(ax[7], (1,8));
 ylims!(ax[8], (0.36, 0.52)); xlims!(ax[8], (1, 48));
-ylims!(ax[9], (0, 7)); xlims!(ax[9], (1, 48));
-ylims!(ax[10], (0, 60)); xlims!(ax[8], (1, 48));
-ylims!(ax[11], (0.25, 0.6)); xlims!(ax[11], (1, 48));
+ylims!(ax[9], (0, 10)); xlims!(ax[9], (1, 48));
+ylims!(ax[10], (0, 60)); xlims!(ax[10], (1, 96));
+ylims!(ax[11], (0.25, 0.8)); xlims!(ax[11], (1, 48));
 
 # to record some interaction
 # record(scene, "images\\Interaction2D.gif") do io
