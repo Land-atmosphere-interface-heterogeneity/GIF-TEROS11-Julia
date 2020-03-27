@@ -1,4 +1,4 @@
-using Makie, MakieLayout, Dates, GLMakie, GeometryTypes, SparseArrays, UnicodeFun
+using Makie, MakieLayout, Dates, GLMakie, GeometryTypes, SparseArrays, UnicodeFun, Printf
 using PlotUtils: optimize_ticks
 
 function MakieLayout.legendelements(plot::BarPlot)
@@ -79,6 +79,14 @@ layout = GridLayout(
 		    alignmode = Outside(10, 10, 10, 10)
 		    )
 
+function formatter(xs)
+    map(xs) do x
+        str = @sprintf("%.2f", x)
+        startswith(str, "0") ? str[2:end] : str
+    end
+end
+ticks = CustomTicks((mi, ma, px) -> MakieLayout.locateticks(0.35, 0.48, 5), formatter)
+
 #layout = layoutscene(6, 3, 10, resolution = (900, 900));
 ax = Array{LAxis}(undef, 11);
 sl = layout[6, 1:2] = LSlider(scene, range=1:n_all);
@@ -141,7 +149,7 @@ cbar = Array{LColorbar}(undef,3);
 ax[5] = layout[3, 1] = LAxis(scene, ylabel = "1 Hectar", ylabelpadding = 10, xticklabelsvisible = false, xticksvisible = false, yticklabelsvisible = false, yticksvisible = false);
 heatmap!(ax[5], Data.x, Data.y, lift(X-> Matrix(sparse(Data.x, Data.y, Data.SWC_daily[X,:])), sl.value), colormap = :kdc, colorrange = (0.35, 0.48), interpolate = true, show_axis = false);
 xlims!(ax[5], (1,8)); ylims!(ax[5], (1,8));
-cbar[1] = layout[2, 1] = LColorbar(scene, height = 20, limits = (0.35, 0.48), label = to_latex("\\theta (m^3 m^{-3})"), colormap = :kdc, vertical = false, labelpadding = -5, ticklabelalign = (:center, :center), ticklabelpad = 15);
+cbar[1] = layout[2, 1] = LColorbar(scene, height = 20, limits = (0.35, 0.48), label = to_latex("\\theta (m^3 m^{-3})"), colormap = :kdc, vertical = false, labelpadding = -5, ticklabelalign = (:center, :center), ticklabelpad = 15, ticks = ticks);
 
 ax[6] = layout[3, 2] = LAxis(scene, yticksvisible = false, yticklabelsvisible = false, xticklabelsvisible = false, xticksvisible = false);
 heatmap!(ax[6], Data.x, Data.y, lift(X-> Matrix(sparse(Data.x, Data.y, Data.Tsoil_daily[X,:])), sl.value), colormap = :fire, colorrange = (1, 7), show_axis = false, interpolate = true);
