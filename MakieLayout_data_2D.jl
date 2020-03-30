@@ -71,7 +71,7 @@ Tsoil_std = [std(skipmissing(Data.Tsoil[i,:])) for i = 1:size(Data.Tsoil,1)];
 #Rsoil_mean = [mean(skipmissing(Data.SWC[i,:])) for i = 1:size(Data.SWC,1)]
 
 # Create Scene and 2D axis
-scene = Scene(resolution = (900, 900), camera=campixel!);
+scene = Scene(resolution = (920, 1000), camera=campixel!);
 layout = GridLayout(
 		    scene, 6, 3, 
 		    colsizes = [Auto(), Auto(), Auto()],
@@ -98,13 +98,13 @@ precipbar = barplot!(ax[1], Data.Dtime_all_rata[1:end], Data.Precip_daily[1:end]
 scatter!(ax[1], lift(X-> [Point2f0(Data.Dtime_all_rata[X], 0)], sl.value), marker = :vline, markersize = Vec2f0(0.5, 200), color = :black);
 xlims!(ax[1], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[1], (0, 60));
 
-ax[2] = layout[5, 1:2] = LAxis(scene, ylabel = to_latex("\\theta (m^3 m^{-3})"), xlabel="Date", ylabelpadding = 15, ygridvisible = false, xgridvisible = false, yticks = ticks_SWC);
+ax[2] = layout[5, 1:2] = LAxis(scene, ylabel = to_latex("\\theta (m^3 m^{-3})"), xlabel="Date", ylabelpadding = -5, ygridvisible = false, xgridvisible = false, yticks = ticks_SWC);
 lSWC = lines!(ax[2], Data.Dtime_all_rata[1:end], Data.SWC_daily_mean[1:end], color = :blue, linewidth = 2);
 bSWC = band!(ax[2], Data.Dtime_all_rata[1:end], Data.SWC_daily_mean[1:end] + Data.SWC_daily_std[1:end], Data.SWC_daily_mean[1:end] - Data.SWC_daily_std[1:end], color = color = RGBAf0(0,0,1,0.3));
 xlims!(ax[2], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[2], (0.36, 0.52));
 ax[2].xticks[] = ManualTicks(datetime2rata.(Data.dateticks) , Dates.format.(Data.dateticks, "yy-mm-dd"));
 
-ax[3] = layout[4, 1:2] = LAxis(scene, ylabel= to_latex("T_{soil} (°C)"), ylabelpadding = 15, xticklabelsvisible = false, xticksvisible = false, ygridvisible = false, xgridvisible = false);
+ax[3] = layout[4, 1:2] = LAxis(scene, ylabel= to_latex("T_{soil} (°C)"), ylabelpadding = -5, xticklabelsvisible = false, xticksvisible = false, ygridvisible = false, xgridvisible = false);
 lTs = lines!(ax[3], Data.Dtime_all_rata[1:end], Data.Tsoil_daily_mean[1:end], color = :red, linewidth = 2);
 bTs = band!(ax[3], Data.Dtime_all_rata[1:end], Data.Tsoil_daily_mean[1:end] + Data.Tsoil_daily_std[1:end], Data.Tsoil_daily_mean[1:end] - Data.Tsoil_daily_std[1:end], color = RGBAf0(1,0,0,0.3));
 scatter!(ax[3], lift(X-> [Point2f0(Data.Dtime_all_rata[X], 0)], sl.value), marker = :vline, markersize = Vec2f0(0.5,50), color = :black);
@@ -131,7 +131,7 @@ lines!(ax[8], 1:48, lift(X-> SWC_mean[1+(X-1)*48:X*48], sl.value), color = :blue
 band!(ax[8], 1:48, lift(X-> SWC_mean[1+(X-1)*48:X*48] + SWC_std[1+(X-1)*48:X*48], sl.value), lift(X->SWC_mean[1+(X-1)*48:X*48] - SWC_std[1+(X-1)*48:X*48], sl.value), color = RGBAf0(0,0,1,0.3));
 ylims!(ax[8], (0.36, 0.52)); xlims!(ax[8], (1, 48));
 
-ax[10] = layout[5, 3] = LAxis(scene, ylabel = "Precip (mm)", xticklabelsvisible = false, xticksvisible = false, yticklabelsvisible = true, yticksvisible = true, yaxisposition = :right, ylabelpadding = 15, yticklabelalign = (:left, :center), xgridvisible = false, ygridvisible = false);
+ax[10] = layout[5, 3] = LAxis(scene, ylabel = "Precip (mm)", xticklabelsvisible = false, xticksvisible = false, yticklabelsvisible = true, yticksvisible = true, yaxisposition = :right, ylabelpadding = -5, yticklabelalign = (:left, :center), xgridvisible = false, ygridvisible = false);
 barplot!(ax[10], 1:25, lift(X-> Data.metdata.Precip[550+(X-1)*25:549 + X*25], sl.value), color = :blue, strokewidth = 2, strokecolor = :black);
 ylims!(ax[10], (0, 60)); xlims!(ax[10], (1, 24));
 
@@ -140,7 +140,7 @@ lines!(ax[9], 1:48, lift(X-> Tsoil_mean[1+(X-1)*48:X*48], sl.value), color = :re
 band!(ax[9], 1:48, lift(X-> Tsoil_mean[1+(X-1)*48:X*48] + Tsoil_std[1+(X-1)*48:X*48], sl.value), lift(X->Tsoil_mean[1+(X-1)*48:X*48] - Tsoil_std[1+(X-1)*48:X*48], sl.value), color = RGBAf0(1,0,0,0.3));
 ylims!(ax[9], (0, 7)); xlims!(ax[9], (1, 48));
 
-ax[11] = layout[4, 3] = LAxis(scene, ylabel = to_latex("R_{soil} (\\mumol m^{-2} s^{-1})"), xticklabelsvisible = false, xticksvisible = false, yticklabelsvisible = true, yticksvisible = true, yaxisposition = :right, ylabelpadding = 15, yticklabelalign = (:left, :center), xgridvisible = false, ygridvisible = false, yticks = ticks_Rs); 
+ax[11] = layout[4, 3] = LAxis(scene, ylabel = to_latex("R_{soil} (\\mumol m^{-2} s^{-1})"), xticklabelsvisible = false, xticksvisible = false, yticklabelsvisible = true, yticksvisible = true, yaxisposition = :right, ylabelpadding = -5, yticklabelalign = (:left, :center), xgridvisible = false, ygridvisible = false, yticks = ticks_Rs); 
 lines!(ax[11], 1:48, lift(X-> Rsoil_HH_mean[1+(X-1)*48:X*48], sl.value), color = :green);
 band!(ax[11], 1:48, lift(X-> Rsoil_HH_mean[1+(X-1)*48:X*48] + Rsoil_HH_std[1+(X-1)*48:X*48], sl.value), lift(X-> Rsoil_HH_mean[1+(X-1)*48:X*48] - Rsoil_HH_std[1+(X-1)*48:X*48], sl.value), color = RGBAf0(0,1,0,0.3));
 ylims!(ax[11], (0.25, 0.6)); xlims!(ax[11], (1, 48));
