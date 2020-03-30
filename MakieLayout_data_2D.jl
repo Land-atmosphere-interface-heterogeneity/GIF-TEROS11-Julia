@@ -71,7 +71,7 @@ Tsoil_std = [std(skipmissing(Data.Tsoil[i,:])) for i = 1:size(Data.Tsoil,1)];
 #Rsoil_mean = [mean(skipmissing(Data.SWC[i,:])) for i = 1:size(Data.SWC,1)]
 
 # Create Scene and 2D axis
-scene = Scene(resolution = (920, 1000), camera=campixel!);
+scene = Scene(resolution = (860, 950), camera=campixel!);
 layout = GridLayout(
 		    scene, 6, 3, 
 		    colsizes = [Auto(), Auto(), Auto()],
