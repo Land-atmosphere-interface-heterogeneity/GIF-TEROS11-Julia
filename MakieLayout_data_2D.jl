@@ -116,12 +116,12 @@ lRs = lines!(ax[4], Data.Dtime_all_rata[1:end], Rsoil_daily_mean[1:end], color =
 bRs = band!(ax[4], Data.Dtime_all_rata[1:end], Rsoil_daily_mean[1:end] + Rsoil_daily_std[1:end], Rsoil_daily_mean[1:end] - Rsoil_daily_std[1:end], color = RGBAf0(0,1,0,0.3));
 xlims!(ax[4], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[4], (0.25, 0.6));
 
-leg = layout[4, 1:2] = LLegend(scene, [[bTs, lTs], [bRs, lRs]], [to_latex("T_{soil} (°C)"), to_latex("R_{soil} (\\mumol m^{-2} s^{-1})")], halign = :right, valign = :top, orientation = :horizontal, framevisible = false);
+leg = layout[4, 1:2] = LLegend(scene, [[bTs, lTs], [bRs, lRs]], [to_latex("T_{soil} (°C)"), to_latex("R_{soil} (\\mumol m^{-2} s^{-1})")], halign = :left, valign = :top, orientation = :horizontal, framevisible = false);
 #LLegend(scene; halign = :right, valign = :top, orientation = :horizontal, framevisible = false);
 #push!(leg, to_latex("T_{soil} (°C)"), bTs, lTs);
 #push!(leg, to_latex("R_{soil} (\\mumol m^{-2} s^{-1})"), bRs, lRs);
 
-leg2 = layout[5, 1:2] =  LLegend(scene, [[bSWC, lSWC], precipbar], [to_latex("\\theta (m^3 m^{-3})"), "Precip (mm)"], halign = :right, valign = :top, orientation = :horizontal, framevisible = false);
+leg2 = layout[5, 1:2] =  LLegend(scene, [[bSWC, lSWC], precipbar], [to_latex("\\theta (m^3 m^{-3})"), "Precip (mm)"], halign = :left, valign = :top, orientation = :horizontal, framevisible = false);
 #LLegend(scene; halign = :right, valign = :top, orientation = :horizontal, framevisible = false);
 #push!(leg2, to_latex("\\theta (m^3 m^{-3})"), bSWC, lSWC);
 #push!(leg2, "Precip (mm)", precipbar);
@@ -153,9 +153,9 @@ xlims!(ax[5], (1,8)); ylims!(ax[5], (1,8));
 cbar[1] = layout[2, 1] = LColorbar(scene, height = 20, limits = (0.35, 0.48), label = to_latex("\\theta (m^3 m^{-3})"), colormap = :kdc, vertical = false, labelpadding = -5, ticklabelalign = (:center, :center), ticklabelpad = 15, ticks = ticks_SWC);
 
 ax[6] = layout[3, 2] = LAxis(scene, yticksvisible = false, yticklabelsvisible = false, xticklabelsvisible = false, xticksvisible = false);
-heatmap!(ax[6], Data.x, Data.y, lift(X-> Matrix(sparse(Data.x, Data.y, Data.Tsoil_daily[X,:])), sl.value), colormap = :fire, colorrange = (1, 7), show_axis = false, interpolate = false);
+heatmap!(ax[6], Data.x, Data.y, lift(X-> Matrix(sparse(Data.x, Data.y, Data.Tsoil_daily[X,:])), sl.value), colormap = :fire, colorrange = (1, 8), show_axis = false, interpolate = false);
 xlims!(ax[6], (1,8)); ylims!(ax[6], (1,8));
-cbar[2] = layout[2, 2] = LColorbar(scene, height = 20, limits = (1, 7), label = to_latex("T_{soil} (°C)"), colormap = :fire, vertical = false, labelpadding = -5, ticklabelalign = (:center, :center), ticklabelpad = 15);
+cbar[2] = layout[2, 2] = LColorbar(scene, height = 20, limits = (1, 8), label = to_latex("T_{soil} (°C)"), colormap = :fire, vertical = false, labelpadding = -5, ticklabelalign = (:center, :center), ticklabelpad = 15);
 
 ax[7] = layout[3, 3] = LAxis(scene, yticksvisible = false,  yticklabelsvisible = false, xticklabelsvisible = false, xticksvisible = false);
 heatmap!(ax[7], Data.x, Data.y, lift(X-> Matrix(sparse(Data.x, Data.y, Rsoil_daily[X,:])), sl.value), colormap = :kgy, colorrange = (0.25, 0.6), show_axis = false, interpolate = false);
