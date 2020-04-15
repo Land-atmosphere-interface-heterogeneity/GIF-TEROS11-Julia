@@ -86,32 +86,33 @@ function formatter(xs)
     end
 end;
 ticks_SWC = CustomTicks((mi, ma, px) -> MakieLayout.locateticks(0.35, 0.48, 5), formatter);
-ticks_Rs  = CustomTicks((mi, ma, px) -> MakieLayout.locateticks(0.25, 0.6, 5), formatter);
+ticks_Rs  = CustomTicks((mi, ma, px) -> MakieLayout.locateticks(0.25, 1, 5), formatter);
+labelpad = 15;
 
 #layout = layoutscene(6, 3, 10, resolution = (900, 900));
 ax = Array{LAxis}(undef, 11);
 sl = layout[6, 1:2] = LSlider(scene, range=1:n_all);
 Text_date = layout[1,1:3] = LText(scene, text= lift(X->Dates.format(Data.Dtime_all[X], "e, dd u yyyy"), sl.value), textsize=40);
 
-ax[1] = layout[5, 1:2] = LAxis(scene, yaxisposition = :right, xticklabelsvisible = false, xticksvisible = false, ylabelpadding = 15, xgridvisible = false, ygridvisible = false, yticklabelalign = (:left, :center), yticklabelsvisible = false, yticksvisible = false);
+ax[1] = layout[5, 1:2] = LAxis(scene, yaxisposition = :right, xticklabelsvisible = false, xticksvisible = false, ylabelpadding = labelpad, xgridvisible = false, ygridvisible = false, yticklabelalign = (:left, :center), yticklabelsvisible = false, yticksvisible = false);
 precipbar = barplot!(ax[1], Data.Dtime_all_rata[1:end], Data.Precip_daily[1:end], color = :blue, strokewidth = 2, strokecolor = :black);
 scatter!(ax[1], lift(X-> [Point2f0(Data.Dtime_all_rata[X], 0)], sl.value), marker = :vline, markersize = Vec2f0(0.5, 200), color = :black);
 xlims!(ax[1], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[1], (0, 60));
 
-ax[2] = layout[5, 1:2] = LAxis(scene, ylabel = to_latex("\\theta (m^3 m^{-3})"), xlabel="Date", ylabelpadding = -5, ygridvisible = false, xgridvisible = false, yticks = ticks_SWC);
+ax[2] = layout[5, 1:2] = LAxis(scene, ylabel = to_latex("\\theta (m^3 m^{-3})"), xlabel="Date", ylabelpadding = labelpad, ygridvisible = false, xgridvisible = false, yticks = ticks_SWC);
 lSWC = lines!(ax[2], Data.Dtime_all_rata[1:end], Data.SWC_daily_mean[1:end], color = :blue, linewidth = 2);
 bSWC = band!(ax[2], Data.Dtime_all_rata[1:end], Data.SWC_daily_mean[1:end] + Data.SWC_daily_std[1:end], Data.SWC_daily_mean[1:end] - Data.SWC_daily_std[1:end], color = color = RGBAf0(0,0,1,0.3));
 xlims!(ax[2], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[2], (0.36, 0.52));
 ax[2].xticks[] = ManualTicks(datetime2rata.(Data.dateticks) , Dates.format.(Data.dateticks, "yy-mm-dd"));
 
-ax[3] = layout[4, 1:2] = LAxis(scene, ylabel= to_latex("T_{soil} (°C)"), ylabelpadding = -5, xticklabelsvisible = false, xticksvisible = false, ygridvisible = false, xgridvisible = false);
+ax[3] = layout[4, 1:2] = LAxis(scene, ylabel= to_latex("T_{soil} (°C)"), ylabelpadding = labelpad, xticklabelsvisible = false, xticksvisible = false, ygridvisible = false, xgridvisible = false);
 lTs = lines!(ax[3], Data.Dtime_all_rata[1:end], Data.Tsoil_daily_mean[1:end], color = :red, linewidth = 2);
 bTs = band!(ax[3], Data.Dtime_all_rata[1:end], Data.Tsoil_daily_mean[1:end] + Data.Tsoil_daily_std[1:end], Data.Tsoil_daily_mean[1:end] - Data.Tsoil_daily_std[1:end], color = RGBAf0(1,0,0,0.3));
 scatter!(ax[3], lift(X-> [Point2f0(Data.Dtime_all_rata[X], 0)], sl.value), marker = :vline, markersize = Vec2f0(0.5,50), color = :black);
 xlims!(ax[3], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[3], (0, 7));
 ax[3].xticks[] = ManualTicks(datetime2rata.(Data.dateticks) , Dates.format.(Data.dateticks, "yy-mm-dd"));
 
-ax[4] = layout[4, 1:2] = LAxis(scene, xticklabelsvisible = false, xticksvisible = false, xgridvisible = false, ygridvisible = false, yaxisposition = :right, ylabelpadding = 15, yticklabelalign = (:left, :center), yticklabelsvisible = false, yticksvisible = false);
+ax[4] = layout[4, 1:2] = LAxis(scene, xticklabelsvisible = false, xticksvisible = false, xgridvisible = false, ygridvisible = false, yaxisposition = :right, ylabelpadding = 5, yticklabelalign = (:left, :center), yticklabelsvisible = false, yticksvisible = false);
 lRs = lines!(ax[4], Data.Dtime_all_rata[1:end], Rsoil_daily_mean[1:end], color = :green);
 bRs = band!(ax[4], Data.Dtime_all_rata[1:end], Rsoil_daily_mean[1:end] + Rsoil_daily_std[1:end], Rsoil_daily_mean[1:end] - Rsoil_daily_std[1:end], color = RGBAf0(0,1,0,0.3));
 xlims!(ax[4], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[4], (0.25, 0.6));
@@ -131,7 +132,7 @@ lines!(ax[8], 1:48, lift(X-> SWC_mean[1+(X-1)*48:X*48], sl.value), color = :blue
 band!(ax[8], 1:48, lift(X-> SWC_mean[1+(X-1)*48:X*48] + SWC_std[1+(X-1)*48:X*48], sl.value), lift(X->SWC_mean[1+(X-1)*48:X*48] - SWC_std[1+(X-1)*48:X*48], sl.value), color = RGBAf0(0,0,1,0.3));
 ylims!(ax[8], (0.36, 0.52)); xlims!(ax[8], (1, 48));
 
-ax[10] = layout[5, 3] = LAxis(scene, ylabel = "Precip (mm)", xticklabelsvisible = false, xticksvisible = false, yticklabelsvisible = true, yticksvisible = true, yaxisposition = :right, ylabelpadding = -5, yticklabelalign = (:left, :center), xgridvisible = false, ygridvisible = false);
+ax[10] = layout[5, 3] = LAxis(scene, ylabel = "Precip (mm)", xticklabelsvisible = false, xticksvisible = false, yticklabelsvisible = true, yticksvisible = true, yaxisposition = :right, ylabelpadding = labelpad, yticklabelalign = (:left, :center), xgridvisible = false, ygridvisible = false);
 barplot!(ax[10], 1:25, lift(X-> Data.metdata.Precip[550+(X-1)*25:549 + X*25], sl.value), color = :blue, strokewidth = 2, strokecolor = :black);
 ylims!(ax[10], (0, 60)); xlims!(ax[10], (1, 24));
 
@@ -140,7 +141,7 @@ lines!(ax[9], 1:48, lift(X-> Tsoil_mean[1+(X-1)*48:X*48], sl.value), color = :re
 band!(ax[9], 1:48, lift(X-> Tsoil_mean[1+(X-1)*48:X*48] + Tsoil_std[1+(X-1)*48:X*48], sl.value), lift(X->Tsoil_mean[1+(X-1)*48:X*48] - Tsoil_std[1+(X-1)*48:X*48], sl.value), color = RGBAf0(1,0,0,0.3));
 ylims!(ax[9], (0, 7)); xlims!(ax[9], (1, 48));
 
-ax[11] = layout[4, 3] = LAxis(scene, ylabel = to_latex("R_{soil} (\\mumol m^{-2} s^{-1})"), xticklabelsvisible = false, xticksvisible = false, yticklabelsvisible = true, yticksvisible = true, yaxisposition = :right, ylabelpadding = -5, yticklabelalign = (:left, :center), xgridvisible = false, ygridvisible = false, yticks = ticks_Rs); 
+ax[11] = layout[4, 3] = LAxis(scene, ylabel = to_latex("R_{soil} (\\mumol m^{-2} s^{-1})"), xticklabelsvisible = false, xticksvisible = false, yticklabelsvisible = true, yticksvisible = true, yaxisposition = :right, ylabelpadding = labelpad, yticklabelalign = (:left, :center), xgridvisible = false, ygridvisible = false, yticks = ticks_Rs); 
 lines!(ax[11], 1:48, lift(X-> Rsoil_HH_mean[1+(X-1)*48:X*48], sl.value), color = :green);
 band!(ax[11], 1:48, lift(X-> Rsoil_HH_mean[1+(X-1)*48:X*48] + Rsoil_HH_std[1+(X-1)*48:X*48], sl.value), lift(X-> Rsoil_HH_mean[1+(X-1)*48:X*48] - Rsoil_HH_std[1+(X-1)*48:X*48], sl.value), color = RGBAf0(0,1,0,0.3));
 ylims!(ax[11], (0.25, 0.6)); xlims!(ax[11], (1, 48));
@@ -150,31 +151,31 @@ cbar = Array{LColorbar}(undef,3);
 ax[5] = layout[3, 1] = LAxis(scene, ylabel = "1 Hectar", ylabelpadding = 10, xticklabelsvisible = false, xticksvisible = false, yticklabelsvisible = false, yticksvisible = false);
 heatmap!(ax[5], Data.x, Data.y, lift(X-> Matrix(sparse(Data.x, Data.y, Data.SWC_daily[X,:])), sl.value), colormap = :kdc, colorrange = (0.35, 0.48), interpolate = false, show_axis = false);
 xlims!(ax[5], (1,8)); ylims!(ax[5], (1,8));
-cbar[1] = layout[2, 1] = LColorbar(scene, height = 20, limits = (0.35, 0.48), label = to_latex("\\theta (m^3 m^{-3})"), colormap = :kdc, vertical = false, labelpadding = -5, ticklabelalign = (:center, :center), ticklabelpad = 15, ticks = ticks_SWC);
+cbar[1] = layout[2, 1] = LColorbar(scene, height = 20, limits = (0.35, 0.48), label = to_latex("\\theta (m^3 m^{-3})"), colormap = :kdc, vertical = false, labelpadding = 5, ticklabelalign = (:center, :center), ticklabelpad = 15, ticks = ticks_SWC);
 
 ax[6] = layout[3, 2] = LAxis(scene, yticksvisible = false, yticklabelsvisible = false, xticklabelsvisible = false, xticksvisible = false);
 heatmap!(ax[6], Data.x, Data.y, lift(X-> Matrix(sparse(Data.x, Data.y, Data.Tsoil_daily[X,:])), sl.value), colormap = :fire, colorrange = (1, 8), show_axis = false, interpolate = false);
 xlims!(ax[6], (1,8)); ylims!(ax[6], (1,8));
-cbar[2] = layout[2, 2] = LColorbar(scene, height = 20, limits = (1, 8), label = to_latex("T_{soil} (°C)"), colormap = :fire, vertical = false, labelpadding = -5, ticklabelalign = (:center, :center), ticklabelpad = 15);
+cbar[2] = layout[2, 2] = LColorbar(scene, height = 20, limits = (0, 15), label = to_latex("T_{soil} (°C)"), colormap = :fire, vertical = false, labelpadding = 5, ticklabelalign = (:center, :center), ticklabelpad = 15);
 
 ax[7] = layout[3, 3] = LAxis(scene, yticksvisible = false,  yticklabelsvisible = false, xticklabelsvisible = false, xticksvisible = false);
 heatmap!(ax[7], Data.x, Data.y, lift(X-> Matrix(sparse(Data.x, Data.y, Rsoil_daily[X,:])), sl.value), colormap = :kgy, colorrange = (0.25, 0.6), show_axis = false, interpolate = false);
 xlims!(ax[7], (1,8)); ylims!(ax[7], (1,8));
-cbar[3] = layout[2, 3] = LColorbar(scene, height = 20, limits = (0.25, 0.6), label = to_latex("R_{soil} (\\mumol m^{-2} s^{-1})"), colormap = :kgy, vertical = false, labelpadding = -5, ticklabelalign = (:center, :center), ticklabelpad = 15, ticks = ticks_Rs);
+cbar[3] = layout[2, 3] = LColorbar(scene, height = 20, limits = (0.25, 1), label = to_latex("R_{soil} (\\mumol m^{-2} s^{-1})"), colormap = :kgy, vertical = false, labelpadding = 5, ticklabelalign = (:center, :center), ticklabelpad = 15, ticks = ticks_Rs);
 
 scene
 
 xlims!(ax[1], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[1], (0, 60));
 xlims!(ax[2], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[2], (0.36, 0.52));
-xlims!(ax[3], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[3], (0, 10));
-xlims!(ax[4], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[4], (0.25, 0.8));
+xlims!(ax[3], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[3], (0, 15));
+xlims!(ax[4], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[4], (0.25, 1));
 xlims!(ax[5], (1,8)); ylims!(ax[5], (1,8));
 xlims!(ax[6], (1,8)); ylims!(ax[6], (1,8));
 xlims!(ax[7], (1,8)); ylims!(ax[7], (1,8));
 ylims!(ax[8], (0.36, 0.52)); xlims!(ax[8], (1, 48));
-ylims!(ax[9], (0, 10)); xlims!(ax[9], (1, 48));
+ylims!(ax[9], (0, 15)); xlims!(ax[9], (1, 48));
 ylims!(ax[10], (0, 60)); xlims!(ax[10], (1, 24));
-ylims!(ax[11], (0.25, 0.8)); xlims!(ax[11], (1, 48));
+ylims!(ax[11], (0.25, 1)); xlims!(ax[11], (1, 48));
 
 # to record some interaction
 # record(scene, "images\\Interaction2D.gif") do io
