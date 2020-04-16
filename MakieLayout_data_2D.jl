@@ -1,4 +1,4 @@
-using Makie, MakieLayout, Dates, GLMakie, GeometryTypes, SparseArrays, UnicodeFun, Printf
+using Makie, MakieLayout, Dates, GLMakie, GeometryBasics, SparseArrays, UnicodeFun, Printf
 using PlotUtils: optimize_ticks
 
 function MakieLayout.legendelements(plot::BarPlot)
