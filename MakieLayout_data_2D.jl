@@ -149,19 +149,19 @@ ylims!(ax[11], (0.25, 0.6)); xlims!(ax[11], (1, 48));
 cbar = Array{LColorbar}(undef,3);
 
 ax[5] = layout[3, 1] = LAxis(scene, ylabel = "1 Hectar", ylabelpadding = 10, xticklabelsvisible = false, xticksvisible = false, yticklabelsvisible = false, yticksvisible = false);
-heatmap!(ax[5], Data.x, Data.y, lift(X-> Matrix(sparse(Data.x, Data.y, Data.SWC_daily[X,:])), sl.value), colormap = :kdc, colorrange = (0.35, 0.48), interpolate = false, show_axis = false);
+heatmap!(ax[5], Data.x, Data.y, lift(X-> Matrix(sparse(Data.x, Data.y, Data.SWC_daily[X,:])), sl.value), colormap = cgrad(:RdYlBu; categorical = true), colorrange = (0.35, 0.48), interpolate = true, show_axis = false);
 xlims!(ax[5], (1,8)); ylims!(ax[5], (1,8));
-cbar[1] = layout[2, 1] = LColorbar(scene, height = 20, limits = (0.35, 0.48), label = to_latex("\\theta (m^3 m^{-3})"), colormap = :kdc, vertical = false, labelpadding = 5, ticklabelalign = (:center, :center), ticklabelpad = 15, ticks = ticks_SWC);
+cbar[1] = layout[2, 1] = LColorbar(scene, height = 20, limits = (0.35, 0.48), label = to_latex("\\theta (m^3 m^{-3})"), colormap = cgrad(:RdYlBu; categorical = true), vertical = false, labelpadding = 5, ticklabelalign = (:center, :center), ticklabelpad = 15, ticks = ticks_SWC);
 
 ax[6] = layout[3, 2] = LAxis(scene, yticksvisible = false, yticklabelsvisible = false, xticklabelsvisible = false, xticksvisible = false);
-heatmap!(ax[6], Data.x, Data.y, lift(X-> Matrix(sparse(Data.x, Data.y, Data.Tsoil_daily[X,:])), sl.value), colormap = :fire, colorrange = (1, 8), show_axis = false, interpolate = false);
+heatmap!(ax[6], Data.x, Data.y, lift(X-> Matrix(sparse(Data.x, Data.y, Data.Tsoil_daily[X,:])), sl.value), colormap = cgrad(:RdYlBu; categorical = true), colorrange = (1, 8), show_axis = false, interpolate = true);
 xlims!(ax[6], (1,8)); ylims!(ax[6], (1,8));
-cbar[2] = layout[2, 2] = LColorbar(scene, height = 20, limits = (0, 15), label = to_latex("T_{soil} (°C)"), colormap = :fire, vertical = false, labelpadding = 5, ticklabelalign = (:center, :center), ticklabelpad = 15);
+cbar[2] = layout[2, 2] = LColorbar(scene, height = 20, limits = (0, 15), label = to_latex("T_{soil} (°C)"), colormap = cgrad(:RdYlBu; categorical = true), vertical = false, labelpadding = 5, ticklabelalign = (:center, :center), ticklabelpad = 15);
 
 ax[7] = layout[3, 3] = LAxis(scene, yticksvisible = false,  yticklabelsvisible = false, xticklabelsvisible = false, xticksvisible = false);
-heatmap!(ax[7], Data.x, Data.y, lift(X-> Matrix(sparse(Data.x, Data.y, Rsoil_daily[X,:])), sl.value), colormap = :kgy, colorrange = (0.25, 0.6), show_axis = false, interpolate = false);
+heatmap!(ax[7], Data.x, Data.y, lift(X-> Matrix(sparse(Data.x, Data.y, Rsoil_daily[X,:])), sl.value), colormap = cgrad(:RdYlBu; categorical = true), colorrange = (0.25, 0.6), show_axis = false, interpolate = true);
 xlims!(ax[7], (1,8)); ylims!(ax[7], (1,8));
-cbar[3] = layout[2, 3] = LColorbar(scene, height = 20, limits = (0.25, 1), label = to_latex("R_{soil} (\\mumol m^{-2} s^{-1})"), colormap = :kgy, vertical = false, labelpadding = 5, ticklabelalign = (:center, :center), ticklabelpad = 15, ticks = ticks_Rs);
+cbar[3] = layout[2, 3] = LColorbar(scene, height = 20, limits = (0.25, 1), label = to_latex("R_{soil} (\\mumol m^{-2} s^{-1})"), colormap = cgrad(:RdYlBu; categorical = true), vertical = false, labelpadding = 5, ticklabelalign = (:center, :center), ticklabelpad = 15, ticks = ticks_Rs);
 
 scene
 
@@ -178,7 +178,7 @@ ylims!(ax[10], (0, 60)); xlims!(ax[10], (1, 24));
 ylims!(ax[11], (0.25, 1)); xlims!(ax[11], (1, 48));
 
 # to record some interaction
-# record(scene, "images\\Interaction2D.gif") do io
+# record(scene, "images\\Interaction2D.mp4") do io
 #      for i = 1:200
 #          sleep(0.1)     
 #          recordframe!(io) # record a new frame
