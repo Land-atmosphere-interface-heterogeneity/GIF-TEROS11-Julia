@@ -178,7 +178,7 @@ ylims!(ax[10], (0, 60)); xlims!(ax[10], (1, 24));
 ylims!(ax[11], (0.25, 1)); xlims!(ax[11], (1, 48));
 
 # to record some interaction
-# record(scene, "images\\Interaction2D.mp4") do io
+# record(scene, "images\\Interaction2D.gif") do io
 #      for i = 1:200
 #          sleep(0.1)     
 #          recordframe!(io) # record a new frame
