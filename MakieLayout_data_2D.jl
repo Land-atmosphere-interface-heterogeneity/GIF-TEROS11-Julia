@@ -49,7 +49,7 @@ Data = loaddata();
 # Modeled Rsoil
 n_all = size(Data.SWC_daily, 1); # Below are random data, for now
 PD = 3.1; porosity = 1-BD/PD # Avoid complexe number problem DAMM
-Rsoil_daily = [DAMM.(Data.Tsoil_daily[i,:], Data.SWC_daily[i,:]) for i = 1:n_all];
+Rsoil_daily = [DAMM.(Data.Tsoil_daily[i,:], Data.SWC_daily[i,:], EaSx = 58.00) for i = 1:n_all];
 Rsoil_daily = reduce(vcat, adjoint.(Rsoil_daily));
 Rsoil_daily_mean = [mean(filter(x -> x > 0, Rsoil_daily[i,:])) for i = 1:n_all];
 Rsoil_daily_std = [std(filter(x -> x > 0, Rsoil_daily[i,:])) for i = 1:n_all];
@@ -58,7 +58,7 @@ Rsoil_daily_std = [std(filter(x -> x > 0, Rsoil_daily[i,:])) for i = 1:n_all];
 SWC  = replace(Data.SWC , missing=>0.0); 
 Tsoil  = replace(Data.Tsoil , missing=>0.0); 
 n = size(Data.Dtime, 1);
-Rsoil_HH = [DAMM.(Tsoil[i,:], SWC[i,:]) for i = 1:n];
+Rsoil_HH = [DAMM.(Tsoil[i,:], SWC[i,:], EaSx = 58.00) for i = 1:n];
 Rsoil_HH = reduce(vcat, adjoint.(Rsoil_HH));
 Rsoil_HH_mean = [mean(filter(x -> x > 0, Rsoil_HH[i,:])) for i = 1:n];
 Rsoil_HH_std = [std(filter(x -> x > 0, Rsoil_HH[i,:])) for i = 1:n];
@@ -159,23 +159,23 @@ xlims!(ax[6], (1,8)); ylims!(ax[6], (1,8));
 cbar[2] = layout[2, 2] = LColorbar(scene, height = 20, limits = (0, 25), label = to_latex("T_{soil} (°C)"), colormap = reverse(cgrad(:RdYlBu; categorical = true)), vertical = false, labelpadding = -5, ticklabelalign = (:center, :center), ticklabelpad = 15);
 
 ax[7] = layout[3, 3] = LAxis(scene, yticksvisible = false,  yticklabelsvisible = false, xticklabelsvisible = false, xticksvisible = false);
-heatmap!(ax[7], Data.x, Data.y, lift(X-> Matrix(sparse(Data.x, Data.y, Rsoil_daily[X,:])), sl.value), colormap = reverse(cgrad(:RdYlBu; categorical = true)), colorrange = (0.25, 3), show_axis = false, interpolate = true);
+heatmap!(ax[7], Data.x, Data.y, lift(X-> Matrix(sparse(Data.x, Data.y, Rsoil_daily[X,:])), sl.value), colormap = reverse(cgrad(:RdYlBu; categorical = true)), colorrange = (0, 10), show_axis = false, interpolate = true);
 xlims!(ax[7], (1,8)); ylims!(ax[7], (1,8));
-cbar[3] = layout[2, 3] = LColorbar(scene, height = 20, limits = (0.25, 3), label = to_latex("R_{soil} (\\mumol m^{-2} s^{-1})"), colormap = reverse(cgrad(:RdYlBu; categorical = true)), vertical = false, labelpadding = -5, ticklabelalign = (:center, :center), ticklabelpad = 15);
+cbar[3] = layout[2, 3] = LColorbar(scene, height = 20, limits = (0, 10), label = to_latex("R_{soil} (\\mumol m^{-2} s^{-1})"), colormap = reverse(cgrad(:RdYlBu; categorical = true)), vertical = false, labelpadding = -5, ticklabelalign = (:center, :center), ticklabelpad = 15);
 
 scene
 
 xlims!(ax[1], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[1], (0, 60));
 xlims!(ax[2], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[2], (0.36, 0.52));
 xlims!(ax[3], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[3], (0, 25));
-xlims!(ax[4], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[4], (0.25, 3));
+xlims!(ax[4], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[4], (0, 10));
 xlims!(ax[5], (1,8)); ylims!(ax[5], (1,8));
 xlims!(ax[6], (1,8)); ylims!(ax[6], (1,8));
 xlims!(ax[7], (1,8)); ylims!(ax[7], (1,8));
 ylims!(ax[8], (0.36, 0.52)); xlims!(ax[8], (1, 48));
 ylims!(ax[9], (0, 25)); xlims!(ax[9], (1, 48));
 ylims!(ax[10], (0, 60)); xlims!(ax[10], (1, 24));
-ylims!(ax[11], (0.25, 3)); xlims!(ax[11], (1, 48));
+ylims!(ax[11], (0, 10)); xlims!(ax[11], (1, 48));
 
 # to record some interaction
 # record(scene, "images\\Interaction2D.gif") do io
