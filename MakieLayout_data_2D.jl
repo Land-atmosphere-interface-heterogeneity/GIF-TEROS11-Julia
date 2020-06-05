@@ -23,6 +23,7 @@ function loaddata()
 	Tsoil_daily, Tsoil_daily_mean, Tsoil_daily_std = dailyval(Tsoil, Dtime_all)
 	SWC_daily, SWC_daily_mean, SWC_daily_std = dailyval(SWC, Dtime_all)
 	Precip_daily = Precipdaily(Precip_d, Dtime_all, Dtime_met_d)
+	dataRSM, RSMmean, RSMstd = loadmanuals("Input\\SFP output")
 
 	# Until I figure how to deal with missing data (in Makie.jl)
 	SWC_daily = replace(SWC_daily, missing=>0.0); SWC_daily_mean = replace(SWC_daily_mean, missing=>0.0); SWC_daily_std = replace(SWC_daily_std, missing=>0.0)
@@ -41,7 +42,7 @@ function loaddata()
 		Tsoil_daily = Tsoil_daily, Tsoil_daily_mean = Tsoil_daily_mean, Tsoil_daily_std = Tsoil_daily_std,
 		SWC_daily = SWC_daily, SWC_daily_mean = SWC_daily_mean, SWC_daily_std = SWC_daily_std,
 		Precip_daily = Precip_daily, Dtime_all_rata = Dtime_all_rata, dateticks = dateticks,
-		#Dtime_rata = Dtime_rata
+		dataRSM = dataRSM, RSMmean = RSMmean, RSMstd = RSMstd #Dtime_rata = Dtime_rata
 		)
 end;
 Data = loaddata();
@@ -96,7 +97,10 @@ Text_date = layout[1,1:3] = LText(scene, text= lift(X->Dates.format(Data.Dtime_a
 
 ax[1] = layout[5, 1:2] = LAxis(scene, yaxisposition = :right, xticklabelsvisible = false, xticksvisible = false, ylabelpadding = labelpad, xgridvisible = false, ygridvisible = false, yticklabelalign = (:left, :center), yticklabelsvisible = false, yticksvisible = false);
 precipbar = barplot!(ax[1], Data.Dtime_all_rata[1:end], Data.Precip_daily[1:end], color = :blue, strokewidth = 2, strokecolor = :black);
-scatter!(ax[1], lift(X-> [Point2f0(Data.Dtime_all_rata[X], 0)], sl.value), marker = :vline, markersize = Vec2f0(0.5, 200), color = :black);
+#scatter!(ax[1], lift(X-> [Point2f0(Data.Dtime_all_rata[X], 0)], sl.value), marker = :vline, markersize = Vec2f0(0.5, 200), color = :black);
+
+lines!(ax[1], lift(X-> Point2f0[(Data.Dtime_all_rata[X], 0), (Data.Dtime_all_rata[X], 60)], sl.value));
+
 xlims!(ax[1], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[1], (0, 60));
 
 ax[2] = layout[5, 1:2] = LAxis(scene, ylabel = to_latex("\\theta (m^3 m^{-3})"), xlabel="Date", ylabelpadding = labelpad, ygridvisible = false, xgridvisible = false);
@@ -108,7 +112,10 @@ ax[2].xticks[] = (datetime2rata.(Data.dateticks) , Dates.format.(Data.dateticks,
 ax[3] = layout[4, 1:2] = LAxis(scene, ylabel= to_latex("T_{soil} (°C)"), ylabelpadding = labelpad, xticklabelsvisible = false, xticksvisible = false, ygridvisible = false, xgridvisible = false);
 lTs = lines!(ax[3], Data.Dtime_all_rata[1:end], Data.Tsoil_daily_mean[1:end], color = :red, linewidth = 2);
 bTs = band!(ax[3], Data.Dtime_all_rata[1:end], Data.Tsoil_daily_mean[1:end] + Data.Tsoil_daily_std[1:end], Data.Tsoil_daily_mean[1:end] - Data.Tsoil_daily_std[1:end], color = RGBAf0(1,0,0,0.3));
-scatter!(ax[3], lift(X-> [Point2f0(Data.Dtime_all_rata[X], 0)], sl.value), marker = :vline, markersize = Vec2f0(0.5,50), color = :black);
+#scatter!(ax[3], lift(X-> [Point2f0(Data.Dtime_all_rata[X], 0)], sl.value), marker = :vline, markersize = Vec2f0(0.5,50), color = :black);
+
+lines!(ax[3], lift(X-> Point2f0[(Data.Dtime_all_rata[X], 0), (Data.Dtime_all_rata[X], 25)], sl.value));
+
 xlims!(ax[3], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[3], (0, 25));
 ax[3].xticks[] = (datetime2rata.(Data.dateticks) , Dates.format.(Data.dateticks, "mm-dd"));
 
@@ -116,6 +123,9 @@ ax[4] = layout[4, 1:2] = LAxis(scene, xticklabelsvisible = false, xticksvisible 
 lRs = lines!(ax[4], Data.Dtime_all_rata[1:end], Rsoil_daily_mean[1:end], color = :green);
 bRs = band!(ax[4], Data.Dtime_all_rata[1:end], Rsoil_daily_mean[1:end] + Rsoil_daily_std[1:end], Rsoil_daily_mean[1:end] - Rsoil_daily_std[1:end], color = RGBAf0(0,1,0,0.3));
 xlims!(ax[4], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[4], (0.25, 3));
+yearm = [2020, 2020, 2020, 2020]; monthm = [04, 05, 05, 06]; daym = [20, 06, 18, 01];
+dates_manual = datetime2rata.(Date.(yearm, monthm, daym));
+scatter!(ax[4], dates_manual, Data.RSMmean, marker = :circle, markersize = 10, color = :black);
 
 leg = layout[4, 1:2] = LLegend(scene, [[bTs, lTs], [bRs, lRs]], [to_latex("T_{soil} (°C)"), to_latex("R_{soil} (\\mumol m^{-2} s^{-1})")], halign = :left, valign = :top, orientation = :horizontal, framevisible = false);
 #LLegend(scene; halign = :right, valign = :top, orientation = :horizontal, framevisible = false);

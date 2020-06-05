@@ -156,4 +156,15 @@ function Precipdaily(Precip_d::Array{Float64,1}, Dtime_all::Array{Date,1}, Dtime
         Precip_daily[Precip_daily.>=50] .= 0 # Delete Precip outliers, daily rain > 50 mm which may be calibration day... this should be fixed by Evan in the qc data!!
 	return Precip_daily
 end;
+function loadmanuals(path::AbstractString)
+	inputs = readdir(path)
+	n = length(inputs)
+	dataRSM = DataFrame[]
+	[push!(dataRSM, CSV.read(joinpath(path, inputs[i]), dateformat="yyyy-mm-dd HH:MM:SS", missingstring = "missing")) for i in 1:n]
+	RSMmean =  Array{Float64}(undef,0)
+	RSMstd = Array{Float64}(undef,0)
+	[push!(RSMmean, mean(skipmissing(dataRSM[i].Exp_Flux))) for i = 1:n]
+	[push!(RSMstd, std(skipmissing(dataRSM[i].Exp_Flux))) for i = 1:n]
+	return dataRSM, RSMmean, RSMstd 
+end;
 # Example of grabbing data in MakieLayout_data_2D.jl
