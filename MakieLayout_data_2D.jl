@@ -125,7 +125,7 @@ bRs = band!(ax[4], Data.Dtime_all_rata[1:end], Rsoil_daily_mean[1:end] + Rsoil_d
 xlims!(ax[4], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[4], (0.25, 3));
 yearm = [2020, 2020, 2020, 2020]; monthm = [04, 05, 05, 06]; daym = [20, 06, 18, 01];
 dates_manual = datetime2rata.(Date.(yearm, monthm, daym));
-scatter!(ax[4], dates_manual, Data.RSMmean, marker = :circle, markersize = 10, color = :black);
+scatter!(ax[4], dates_manual, Data.RSMmean, marker = :circle, markersize = 10 * AbstractPlotting.px, color = :black);
 
 leg = layout[4, 1:2] = LLegend(scene, [[bTs, lTs], [bRs, lRs]], [to_latex("T_{soil} (°C)"), to_latex("R_{soil} (\\mumol m^{-2} s^{-1})")], halign = :left, valign = :top, orientation = :horizontal, framevisible = false);
 #LLegend(scene; halign = :right, valign = :top, orientation = :horizontal, framevisible = false);
