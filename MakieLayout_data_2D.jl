@@ -23,7 +23,7 @@ function loaddata()
 	Tsoil_daily, Tsoil_daily_mean, Tsoil_daily_std = dailyval(Tsoil, Dtime_all)
 	SWC_daily, SWC_daily_mean, SWC_daily_std = dailyval(SWC, Dtime_all)
 	Precip_daily = Precipdaily(Precip_d, Dtime_all, Dtime_met_d)
-	dataRSM, RSMmean, RSMstd = loadmanuals("Input\\SFP output")
+	dataRSM, RSMmean, RSMstd = loadmanuals("Input\\SFP output\\Manual")
 
 	# Until I figure how to deal with missing data (in Makie.jl)
 	SWC_daily = replace(SWC_daily, missing=>0.0); SWC_daily_mean = replace(SWC_daily_mean, missing=>0.0); SWC_daily_std = replace(SWC_daily_std, missing=>0.0)
@@ -123,7 +123,7 @@ ax[4] = layout[4, 1:2] = LAxis(scene, xticklabelsvisible = false, xticksvisible 
 lRs = lines!(ax[4], Data.Dtime_all_rata[1:end], Rsoil_daily_mean[1:end], color = :green);
 bRs = band!(ax[4], Data.Dtime_all_rata[1:end], Rsoil_daily_mean[1:end] + Rsoil_daily_std[1:end], Rsoil_daily_mean[1:end] - Rsoil_daily_std[1:end], color = RGBAf0(0,1,0,0.3));
 xlims!(ax[4], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[4], (0.25, 3));
-yearm = [2020, 2020, 2020, 2020]; monthm = [04, 05, 05, 06]; daym = [20, 06, 18, 01];
+yearm = [2020, 2020, 2020, 2020, 2020]; monthm = [04, 05, 05, 06, 06]; daym = [20, 06, 18, 01, 08];
 dates_manual = datetime2rata.(Date.(yearm, monthm, daym));
 scatter!(ax[4], dates_manual, Data.RSMmean, marker = :circle, markersize = 10 * AbstractPlotting.px, color = :black);
 
@@ -159,33 +159,42 @@ ylims!(ax[11], (0.25, 0.6)); xlims!(ax[11], (1, 48));
 cbar = Array{LColorbar}(undef,3);
 
 ax[5] = layout[3, 1] = LAxis(scene, ylabel = "1 Hectar", ylabelpadding = 10, xticklabelsvisible = false, xticksvisible = false, yticklabelsvisible = false, yticksvisible = false);
-heatmap!(ax[5], Data.x, Data.y, lift(X-> Matrix(sparse(Data.x, Data.y, Data.SWC_daily[X,:])), sl.value), colormap = reverse(cgrad(:RdYlBu; categorical = true)), colorrange = (0.35, 0.48), interpolate = true, show_axis = false);
+hmap1 = heatmap!(ax[5], Data.x, Data.y, lift(X-> Matrix(sparse(Data.x, Data.y, Data.SWC_daily[X,:])), sl.value), colormap = cgrad(:RdYlBu; categorical = true), colorrange = (0.35, 0.48), interpolate = true, show_axis = false);
 xlims!(ax[5], (1,8)); ylims!(ax[5], (1,8));
-cbar[1] = layout[2, 1] = LColorbar(scene, height = 20, limits = (0.35, 0.48), label = to_latex("\\theta (m^3 m^{-3})"), colormap = reverse(cgrad(:RdYlBu; categorical = true)), vertical = false, labelpadding = -5, ticklabelalign = (:center, :center), ticklabelpad = 15);
+cbar[1] = layout[2, 1] = LColorbar(scene, height = 20, limits = (0.35, 0.48), label = to_latex("\\theta (m^3 m^{-3})"), colormap = cgrad(:RdYlBu; categorical = true), vertical = false, labelpadding = -5, ticklabelalign = (:center, :center), ticklabelpad = 15);
 
 ax[6] = layout[3, 2] = LAxis(scene, yticksvisible = false, yticklabelsvisible = false, xticklabelsvisible = false, xticksvisible = false);
-heatmap!(ax[6], Data.x, Data.y, lift(X-> Matrix(sparse(Data.x, Data.y, Data.Tsoil_daily[X,:])), sl.value), colormap = reverse(cgrad(:RdYlBu; categorical = true)), colorrange = (0, 25), show_axis = false, interpolate = true);
+hmap2 = heatmap!(ax[6], Data.x, Data.y, lift(X-> Matrix(sparse(Data.x, Data.y, Data.Tsoil_daily[X,:])), sl.value), colormap = reverse(cgrad(:RdYlBu; categorical = true)), colorrange = (0, 25), show_axis = false, interpolate = true);
 xlims!(ax[6], (1,8)); ylims!(ax[6], (1,8));
 cbar[2] = layout[2, 2] = LColorbar(scene, height = 20, limits = (0, 25), label = to_latex("T_{soil} (°C)"), colormap = reverse(cgrad(:RdYlBu; categorical = true)), vertical = false, labelpadding = -5, ticklabelalign = (:center, :center), ticklabelpad = 15);
 
 ax[7] = layout[3, 3] = LAxis(scene, yticksvisible = false,  yticklabelsvisible = false, xticklabelsvisible = false, xticksvisible = false);
-heatmap!(ax[7], Data.x, Data.y, lift(X-> Matrix(sparse(Data.x, Data.y, Rsoil_daily[X,:])), sl.value), colormap = reverse(cgrad(:RdYlBu; categorical = true)), colorrange = (0, 10), show_axis = false, interpolate = true);
+hmap3 = heatmap!(ax[7], Data.x, Data.y, lift(X-> Matrix(sparse(Data.x, Data.y, Rsoil_daily[X,:])), sl.value), colormap = reverse(cgrad(:RdYlBu; categorical = true)), colorrange = (0, 10), show_axis = false, interpolate = true);
 xlims!(ax[7], (1,8)); ylims!(ax[7], (1,8));
 cbar[3] = layout[2, 3] = LColorbar(scene, height = 20, limits = (0, 10), label = to_latex("R_{soil} (\\mumol m^{-2} s^{-1})"), colormap = reverse(cgrad(:RdYlBu; categorical = true)), vertical = false, labelpadding = -5, ticklabelalign = (:center, :center), ticklabelpad = 15);
 
 scene
 
-xlims!(ax[1], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[1], (0, 60));
-xlims!(ax[2], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[2], (0.36, 0.52));
-xlims!(ax[3], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[3], (0, 25));
-xlims!(ax[4], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[4], (0, 10));
+# Limits
+SWCmin, SWCmax = 0.1, 0.5; Tmin, Tmax = 0, 25; Rmin, Rmax = 0, 20; Pmin, Pmax = 0, 60;
+
+xlims!(ax[1], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[1], (Pmin, Pmax));
+xlims!(ax[2], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[2], (SWCmin, SWCmax));
+xlims!(ax[3], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[3], (Tmin, Tmax));
+xlims!(ax[4], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[4], (Rmin, Rmax));
 xlims!(ax[5], (1,8)); ylims!(ax[5], (1,8));
 xlims!(ax[6], (1,8)); ylims!(ax[6], (1,8));
 xlims!(ax[7], (1,8)); ylims!(ax[7], (1,8));
-ylims!(ax[8], (0.36, 0.52)); xlims!(ax[8], (1, 48));
-ylims!(ax[9], (0, 25)); xlims!(ax[9], (1, 48));
-ylims!(ax[10], (0, 60)); xlims!(ax[10], (1, 24));
-ylims!(ax[11], (0, 10)); xlims!(ax[11], (1, 48));
+ylims!(ax[8], (SWCmin, SWCmax)); xlims!(ax[8], (1, 48));
+ylims!(ax[9], (Tmin, Tmax)); xlims!(ax[9], (1, 48));
+ylims!(ax[10], (Pmin, Pmax)); xlims!(ax[10], (1, 24));
+ylims!(ax[11], (Rmin, Rmax)); xlims!(ax[11], (1, 48));
+cbar[1].limits = (SWCmin, SWCmax);
+cbar[2].limits = (Tmin, Tmax);
+cbar[3].limits = (Rmin, Rmax);
+hmap1.colorrange = (SWCmin, SWCmax); 
+hmap2.colorrange = (Tmin, Tmax);
+hmap3.colorrange = (Rmin, Rmax);
 
 # to record some interaction
 # record(scene, "images\\Interaction2D.gif") do io
