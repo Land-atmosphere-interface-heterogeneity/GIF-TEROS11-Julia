@@ -24,6 +24,7 @@ function loaddata()
 	SWC_daily, SWC_daily_mean, SWC_daily_std = dailyval(SWC, Dtime_all)
 	Precip_daily = Precipdaily(Precip_d, Dtime_all, Dtime_met_d)
 	dataRSM, RSMmean, RSMstd = loadmanuals("Input\\SFP output\\Manual")
+	dataRSA, RSAmean, RSAstd, Date_Auto = loadauto("Input\\SFP output\\Auto")
 
 	# Until I figure how to deal with missing data (in Makie.jl)
 	SWC_daily = replace(SWC_daily, missing=>0.0); SWC_daily_mean = replace(SWC_daily_mean, missing=>0.0); SWC_daily_std = replace(SWC_daily_std, missing=>0.0)
@@ -42,7 +43,8 @@ function loaddata()
 		Tsoil_daily = Tsoil_daily, Tsoil_daily_mean = Tsoil_daily_mean, Tsoil_daily_std = Tsoil_daily_std,
 		SWC_daily = SWC_daily, SWC_daily_mean = SWC_daily_mean, SWC_daily_std = SWC_daily_std,
 		Precip_daily = Precip_daily, Dtime_all_rata = Dtime_all_rata, dateticks = dateticks,
-		dataRSM = dataRSM, RSMmean = RSMmean, RSMstd = RSMstd #Dtime_rata = Dtime_rata
+		dataRSM = dataRSM, RSMmean = RSMmean, RSMstd = RSMstd,
+		dataRSA = dataRSA, RSAmean = RSAmean, RSAstd = RSAstd, Date_Auto = Date_Auto #Dtime_rata = Dtime_rata
 		)
 end;
 Data = loaddata();
@@ -123,9 +125,11 @@ ax[4] = layout[4, 1:2] = LAxis(scene, xticklabelsvisible = false, xticksvisible 
 lRs = lines!(ax[4], Data.Dtime_all_rata[1:end], Rsoil_daily_mean[1:end], color = :green);
 bRs = band!(ax[4], Data.Dtime_all_rata[1:end], Rsoil_daily_mean[1:end] + Rsoil_daily_std[1:end], Rsoil_daily_mean[1:end] - Rsoil_daily_std[1:end], color = RGBAf0(0,1,0,0.3));
 xlims!(ax[4], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[4], (0.25, 3));
-yearm = [2020, 2020, 2020, 2020, 2020]; monthm = [04, 05, 05, 06, 06]; daym = [20, 06, 18, 01, 08];
+yearm = [2020, 2020, 2020, 2020, 2020, 2020]; monthm = [04, 05, 05, 06, 06, 06]; daym = [20, 06, 18, 01, 08, 23];
 dates_manual = datetime2rata.(Date.(yearm, monthm, daym));
+dates_auto = datetime2rata.(Data.Date_Auto);
 scatter!(ax[4], dates_manual, Data.RSMmean, marker = :circle, markersize = 10 * AbstractPlotting.px, color = :black);
+lines!(ax[4], dates_auto, Data.RSAmean, color = :black);
 
 leg = layout[4, 1:2] = LLegend(scene, [[bTs, lTs], [bRs, lRs]], [to_latex("T_{soil} (°C)"), to_latex("R_{soil} (\\mumol m^{-2} s^{-1})")], halign = :left, valign = :top, orientation = :horizontal, framevisible = false);
 #LLegend(scene; halign = :right, valign = :top, orientation = :horizontal, framevisible = false);

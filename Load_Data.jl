@@ -167,4 +167,16 @@ function loadmanuals(path::AbstractString)
 	[push!(RSMstd, std(skipmissing(dataRSM[i].Exp_Flux))) for i = 1:n]
 	return dataRSM, RSMmean, RSMstd 
 end;
+function loadauto(path::AbstractString)
+	inputs = readdir(path)
+	dataRSA = CSV.read(joinpath(path, inputs[1]), dateformat="yyyy-mm-dd HH:MM:SS", missingstring = "missing");
+	RSAmean =  Array{Float64}(undef,0)
+	RSAstd = Array{Float64}(undef,0)
+	Date_Auto = Date(2020,5,26):Day(1):Date(2020,6,23); 
+	m = length(Date_Auto)
+	# Need mean and std for each day, for now
+	[push!(RSAmean, mean(skipmissing(dataRSA.Exp_Flux[findall(x -> x == Date_Auto[j], Date.(dataRSA.Date_IV))]))) for j in 1:m]
+	[push!(RSAstd, std(skipmissing(dataRSA.Exp_Flux[findall(x -> x == Date_Auto[j], Date.(dataRSA.Date_IV))]))) for j in 1:m]
+	return dataRSA, RSAmean, RSAstd, Date_Auto 
+end;
 # Example of grabbing data in MakieLayout_data_2D.jl
