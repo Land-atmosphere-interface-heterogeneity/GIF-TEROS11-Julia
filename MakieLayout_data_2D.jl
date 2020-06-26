@@ -130,10 +130,16 @@ dates_manual = datetime2rata.(Date.(yearm, monthm, daym));
 dates_auto = datetime2rata.(Data.Date_Auto);
 scatter!(ax[4], dates_manual, Data.RSMmean, marker = :circle, markersize = 10 * AbstractPlotting.px, color = :black);
 
-[lines!(ax[4], Point2f0[(dates_manual[i], Data.RSMmean[i] + Data.RSMstd[i]), (dates_manual[i], Data.RSMmean[i] - Data.RSMstd[i])], color = :black) for i in 1:6];
+#[lines!(ax[4], Point2f0[(dates_manual[i], Data.RSMmean[i] + Data.RSMstd[i]), (dates_manual[i], Data.RSMmean[i] - Data.RSMstd[i])], color = :black) for i in 1:6];
 
-lines!(ax[4], dates_auto, Data.RSAmean, color = :black);
-band!(ax[4], dates_auto, Data.RSAmean + Data.RSAstd, Data.RSAmean - Data.RSAstd, color = RGBAf0(0,0,0,0.3));
+bottoms = Point2f0.(dates_manual, Data.RSMmean .- Data.RSMstd);
+tops = Point2f0.(dates_manual, Data.RSMmean .+ Data.RSMstd);
+pointpairs = collect(zip(bottoms, tops));
+linesegments!(ax[4], pointpairs);
+
+
+lines!(ax[4], dates_auto, Data.RSAmean, color = RGBAf0(1,0,1));
+band!(ax[4], dates_auto, Data.RSAmean + Data.RSAstd, Data.RSAmean - Data.RSAstd, color = RGBAf0(1,0,1,0.3));
 
 leg = layout[4, 1:2] = LLegend(scene, [[bTs, lTs], [bRs, lRs]], [to_latex("T_{soil} (°C)"), to_latex("R_{soil} (\\mumol m^{-2} s^{-1})")], halign = :left, valign = :top, orientation = :horizontal, framevisible = false);
 #LLegend(scene; halign = :right, valign = :top, orientation = :horizontal, framevisible = false);
