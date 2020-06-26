@@ -1,0 +1,21 @@
+Add soil moisture and soil temperature at ~ 5 cm depth from automated chambers
+
+Add a menu (on the right of the figure): 
+error bar option (toggle): standard deviation or range (min and max)
+Rsoil heatmap option (toggle): modelled or measured  
+put date slider in the menu on the right 
+add a slider to change hour of the day (currently slider change day)
+Option 3D or 2D (toggle): 3D is using elevation data as z
+Heatmaps color range option (toggle): range (min max) of the day vs. range (min max) of the period
+List: select the year (for later, if many years of data)
+List: model (currently, only DAMM). The model will fit on the data (and account for spatial heterogeneity and temporal heterogeneity)
+Click button to open bench-mark result: open a window, showing different metric (seasonality, diurnal pattern, r2, RMSE, etc...) 
+Click button to visualize model parameters (not that there is 64 sets of parameters, one set for each location in space)
+Toggle button to show different heatmaps (64 locations): soil texture, bulk density, ... other soil properties
+
+
+Eventually, I will make a package of this interactive figure (almost a GUI), so that it can work with different datasets (e.g. at other locations, with more or less sensors...) 
+--> If we deploy the same experimental design with different resolutions at ARM sites for example
+
+Also, I will make this interactive figure freely accessible on a website. These will be one of the option of the platform for heterogeneity 
+--> and many others could be done, using different datasets / database of land-atmosphere exchanges
