@@ -14,11 +14,11 @@ end;
 # Download and load met data
 function loadmet(path::AbstractString)
         [download("http://www.atmos.anl.gov/ANLMET/numeric/2019/"*i*"19met.data", joinpath(path, i*"19met.data")) for i in ["nov", "dec"]];
-        [download("http://www.atmos.anl.gov/ANLMET/numeric/2020/"*i*"20met.data", joinpath(path, i*"20met.data")) for i in ["jan", "feb","mar","apr"]];
+        [download("http://www.atmos.anl.gov/ANLMET/numeric/2020/"*i*"20met.data", joinpath(path, i*"20met.data")) for i in ["jan", "feb","mar","apr","may"]];
 	col_name = [:DOM,:Month,:Year,:Time,:PSC,:WD60,:WS60,:WD_STD60,:T60,:WD10,:WS10,:WD_STD10,:T10,:DPT,:RH,:TD100,:Precip,:RS,:RN,:Pressure,:WatVapPress,:TS10,:TS100,:TS10F]
 	metdata = DataFrame[]
 	[push!(metdata, CSV.read(joinpath(path, i*"19met.data"), delim=' ', header=col_name, ignorerepeated=true, datarow=1, footerskip=2)) for i in ["nov", "dec"]]
-	[push!(metdata, CSV.read(joinpath(path, i*"20met.data"), delim=' ', header=col_name, ignorerepeated=true, datarow=1, footerskip=2)) for i in ["jan", "feb","mar","apr"]]
+	[push!(metdata, CSV.read(joinpath(path, i*"20met.data"), delim=' ', header=col_name, ignorerepeated=true, datarow=1, footerskip=2)) for i in ["jan", "feb","mar","apr","may"]]
 	metdata = reduce(vcat, metdata)
 	return metdata
 end;
@@ -102,8 +102,8 @@ end;
 # Integrate daily Precip
 # I need to redo this... this is not clean. Maybe fixing latest rain on ANLMET website should be done first. 
 function PrecipD(metdata::DataFrame, Dtime_met::Array{DateTime,1})
-	Precip_d = Array{Float64}(undef, 182)
-	Dtime_met_d = Array{DateTime}(undef, 182)
+	Precip_d = Array{Float64}(undef, 213)
+	Dtime_met_d = Array{DateTime}(undef, 213)
 	for i = 1:30
 	    use = findall(x -> Dates.year(x) == 2019 && Dates.day(x) == i && Dates.month(x) == 11, Dtime_met)
 	    Precip_d[i] = sum(metdata.Precip[use])
@@ -133,6 +133,11 @@ function PrecipD(metdata::DataFrame, Dtime_met::Array{DateTime,1})
 	    use = findall(x -> Dates.year(x) == 2020 && Dates.day(x) == i && Dates.month(x) == 4, Dtime_met)
 	    Precip_d[152 + i] = sum(metdata.Precip[use])
 	    Dtime_met_d[152 + i] = Date(DateTime(2020, 4, i)) 	
+	end
+	for i = 1:31
+	    use = findall(x -> Dates.year(x) == 2020 && Dates.day(x) == i && Dates.month(x) == 5, Dtime_met)
+	    Precip_d[182 + i] = sum(metdata.Precip[use])
+	    Dtime_met_d[182 + i] = Date(DateTime(2020, 5, i)) 	
 	end
 	return Precip_d, Dtime_met_d
 end;
@@ -172,7 +177,7 @@ function loadauto(path::AbstractString)
 	dataRSA = CSV.read(joinpath(path, inputs[1]), dateformat="yyyy-mm-dd HH:MM:SS", missingstring = "missing");
 	RSAmean =  Array{Float64}(undef,0)
 	RSAstd = Array{Float64}(undef,0)
-	Date_Auto = Date(2020,5,26):Day(1):Date(2020,6,23); 
+	Date_Auto = Date(2020,5,26):Day(1):Date(2020,7,8); 
 	m = length(Date_Auto)
 	# Need mean and std for each day, for now
 	[push!(RSAmean, mean(skipmissing(dataRSA.Exp_Flux[findall(x -> x == Date_Auto[j], Date.(dataRSA.Date_IV))]))) for j in 1:m]

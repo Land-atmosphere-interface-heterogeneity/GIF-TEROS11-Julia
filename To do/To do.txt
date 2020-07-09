@@ -1,21 +1,32 @@
-Add soil moisture and soil temperature at ~ 5 cm depth from automated chambers
-
-Add a menu (on the right of the figure): 
-error bar option (toggle): standard deviation or range (min and max)
-Rsoil heatmap option (toggle): modelled or measured  
-put date slider in the menu on the right 
-add a slider to change hour of the day (currently slider change day)
-Option 3D or 2D (toggle): 3D is using elevation data as z
-Heatmaps color range option (toggle): range (min max) of the day vs. range (min max) of the period
-List: select the year (for later, if many years of data)
-List: model (currently, only DAMM). The model will fit on the data (and account for spatial heterogeneity and temporal heterogeneity)
-Click button to open bench-mark result: open a window, showing different metric (seasonality, diurnal pattern, r2, RMSE, etc...) 
-Click button to visualize model parameters (not that there is 64 sets of parameters, one set for each location in space)
-Toggle button to show different heatmaps (64 locations): soil texture, bulk density, ... other soil properties
-
+1. Add soil moisture and soil temperature at ~ 5 cm depth from automated chambers
+2. Add Auto Rsoil in the diurnal subplots
+3. Change the DAMM parameters: fit to data + change each of the 64 porosity to max SWC 
+4. Add legend for Survey and Auto Rsoil (and rename Rsoil modelled)
+5. Add a menu (on the right of the figure): 
+6. error bar option (toggle): standard deviation or range (min and max)
+7. Rsoil heatmap option (toggle): modelled or measured  
+8. put date slider in the menu on the right 
+9. add a slider to change hour of the day (currently slider change day)
+10. Option 3D or 2D (toggle): 3D is using elevation data as z
+11. Heatmaps color range option (toggle): range (min max) of the day vs. range (min max) of the period
+12. List: select the year (for later, if many years of data)
+13. List: model (currently, only DAMM). The model will fit on the data (and account for spatial heterogeneity and temporal heterogeneity)
+14. Click button to open bench-mark result: open a window, showing different metric (seasonality, diurnal pattern, r2, RMSE, etc...) 
+15. Click button to visualize model parameters (not that there is 64 sets of parameters, one set for each location in space)
+16. Toggle button to show different heatmaps (64 locations): soil texture, bulk density, ... other soil properties
+17. How to incorporate flux tower data? 
 
 Eventually, I will make a package of this interactive figure (almost a GUI), so that it can work with different datasets (e.g. at other locations, with more or less sensors...) 
 --> If we deploy the same experimental design with different resolutions at ARM sites for example
 
 Also, I will make this interactive figure freely accessible on a website. These will be one of the option of the platform for heterogeneity 
 --> and many others could be done, using different datasets / database of land-atmosphere exchanges
+
+Note that here, we have a dataset of soil respiration, soil moisture, soil temperature. But the same idea (vizualisation, modelisation, bench-marking of heterogeneity grid dataset)
+ could be applied to any other land-atmosphere exchange dataset (methane, h2o, others...)  
+ 
+ 
+ 
+ Go to Belgium ambassy website, look for info for declaring J1 taxes, if no info on website, call the ambassy
+ 
+ 

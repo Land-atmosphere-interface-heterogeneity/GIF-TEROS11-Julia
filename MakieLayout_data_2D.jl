@@ -109,7 +109,7 @@ ax[2] = layout[5, 1:2] = LAxis(scene, ylabel = to_latex("\\theta (m^3 m^{-3})"),
 lSWC = lines!(ax[2], Data.Dtime_all_rata[1:end], Data.SWC_daily_mean[1:end], color = :blue, linewidth = 2);
 bSWC = band!(ax[2], Data.Dtime_all_rata[1:end], Data.SWC_daily_mean[1:end] + Data.SWC_daily_std[1:end], Data.SWC_daily_mean[1:end] - Data.SWC_daily_std[1:end], color = color = RGBAf0(0,0,1,0.3));
 xlims!(ax[2], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[2], (0.36, 0.52));
-ax[2].xticks[] = (datetime2rata.(Data.dateticks) , Dates.format.(Data.dateticks, "mm-dd"));
+ax[2].xticks[] = (datetime2rata.(Data.dateticks) , Dates.format.(Data.dateticks, "mm"));
 
 ax[3] = layout[4, 1:2] = LAxis(scene, ylabel= to_latex("T_{soil} (°C)"), ylabelpadding = labelpad, xticklabelsvisible = false, xticksvisible = false, ygridvisible = false, xgridvisible = false);
 lTs = lines!(ax[3], Data.Dtime_all_rata[1:end], Data.Tsoil_daily_mean[1:end], color = :red, linewidth = 2);
@@ -119,34 +119,34 @@ bTs = band!(ax[3], Data.Dtime_all_rata[1:end], Data.Tsoil_daily_mean[1:end] + Da
 lines!(ax[3], lift(X-> Point2f0[(Data.Dtime_all_rata[X], 0), (Data.Dtime_all_rata[X], 25)], sl.value));
 
 xlims!(ax[3], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[3], (0, 25));
-ax[3].xticks[] = (datetime2rata.(Data.dateticks) , Dates.format.(Data.dateticks, "mm-dd"));
+ax[3].xticks[] = (datetime2rata.(Data.dateticks) , Dates.format.(Data.dateticks, "mm"));
 
 ax[4] = layout[4, 1:2] = LAxis(scene, xticklabelsvisible = false, xticksvisible = false, xgridvisible = false, ygridvisible = false, yaxisposition = :right, ylabelpadding = 5, yticklabelalign = (:left, :center), yticklabelsvisible = false, yticksvisible = false);
 lRs = lines!(ax[4], Data.Dtime_all_rata[1:end], Rsoil_daily_mean[1:end], color = :green);
 bRs = band!(ax[4], Data.Dtime_all_rata[1:end], Rsoil_daily_mean[1:end] + Rsoil_daily_std[1:end], Rsoil_daily_mean[1:end] - Rsoil_daily_std[1:end], color = RGBAf0(0,1,0,0.3));
 xlims!(ax[4], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[4], (0.25, 3));
-yearm = [2020, 2020, 2020, 2020, 2020, 2020]; monthm = [04, 05, 05, 06, 06, 06]; daym = [20, 06, 18, 01, 08, 23];
+yearm = [2020, 2020, 2020, 2020, 2020, 2020, 2020]; monthm = [04, 05, 05, 06, 06, 06, 07]; daym = [20, 06, 18, 01, 08, 23, 08];
 dates_manual = datetime2rata.(Date.(yearm, monthm, daym));
 dates_auto = datetime2rata.(Data.Date_Auto);
-scatter!(ax[4], dates_manual, Data.RSMmean, marker = :circle, markersize = 10 * AbstractPlotting.px, color = :black);
+sRm = scatter!(ax[4], dates_manual, Data.RSMmean, marker = :circle, markersize = 10 * AbstractPlotting.px, color = :black);
 
 #[lines!(ax[4], Point2f0[(dates_manual[i], Data.RSMmean[i] + Data.RSMstd[i]), (dates_manual[i], Data.RSMmean[i] - Data.RSMstd[i])], color = :black) for i in 1:6];
 
 bottoms = Point2f0.(dates_manual, Data.RSMmean .- Data.RSMstd);
 tops = Point2f0.(dates_manual, Data.RSMmean .+ Data.RSMstd);
 pointpairs = collect(zip(bottoms, tops));
-linesegments!(ax[4], pointpairs);
+ssRm = linesegments!(ax[4], pointpairs);
 
 
-lines!(ax[4], dates_auto, Data.RSAmean, color = RGBAf0(1,0,1));
-band!(ax[4], dates_auto, Data.RSAmean + Data.RSAstd, Data.RSAmean - Data.RSAstd, color = RGBAf0(1,0,1,0.3));
+lRa = lines!(ax[4], dates_auto, Data.RSAmean, color = RGBAf0(1,0,1));
+lRb = band!(ax[4], dates_auto, Data.RSAmean + Data.RSAstd, Data.RSAmean - Data.RSAstd, color = RGBAf0(1,0,1,0.3));
 
-leg = layout[4, 1:2] = LLegend(scene, [[bTs, lTs], [bRs, lRs]], [to_latex("T_{soil} (°C)"), to_latex("R_{soil} (\\mumol m^{-2} s^{-1})")], halign = :left, valign = :top, orientation = :horizontal, framevisible = false);
+leg = layout[4, 1:2] = LLegend(scene, [[bTs, lTs], [bRs, lRs], [sRm, ssRm], [lRa, lRb]], [to_latex("T_{soil}"), to_latex("R_{soilmo}"), to_latex("R_{soilmanual}"), to_latex("R_{soilauto}")], halign = :left, valign = :top, orientation = :horizontal, framevisible = false, nbanks = 2);
 #LLegend(scene; halign = :right, valign = :top, orientation = :horizontal, framevisible = false);
 #push!(leg, to_latex("T_{soil} (°C)"), bTs, lTs);
 #push!(leg, to_latex("R_{soil} (\\mumol m^{-2} s^{-1})"), bRs, lRs);
 
-leg2 = layout[5, 1:2] =  LLegend(scene, [[bSWC, lSWC], precipbar], [to_latex("\\theta (m^3 m^{-3})"), "Precip (mm)"], halign = :left, valign = :top, orientation = :horizontal, framevisible = false);
+leg2 = layout[5, 1:2] =  LLegend(scene, [[bSWC, lSWC], precipbar], [to_latex("\\theta"), "Precip"], halign = :left, valign = :top, orientation = :horizontal, framevisible = false);
 #LLegend(scene; halign = :right, valign = :top, orientation = :horizontal, framevisible = false);
 #push!(leg2, to_latex("\\theta (m^3 m^{-3})"), bSWC, lSWC);
 #push!(leg2, "Precip (mm)", precipbar);
@@ -190,7 +190,7 @@ cbar[3] = layout[2, 3] = LColorbar(scene, height = 20, limits = (0, 10), label =
 scene
 
 # Limits
-SWCmin, SWCmax = 0.1, 0.5; Tmin, Tmax = 0, 25; Rmin, Rmax = 0, 20; Pmin, Pmax = 0, 60;
+SWCmin, SWCmax = 0.1, 0.55; Tmin, Tmax = 0, 25; Rmin, Rmax = 0, 20; Pmin, Pmax = 0, 60;
 
 xlims!(ax[1], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[1], (Pmin, Pmax));
 xlims!(ax[2], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[2], (SWCmin, SWCmax));
@@ -211,12 +211,12 @@ hmap2.colorrange = (Tmin, Tmax);
 hmap3.colorrange = (Rmin, Rmax);
 
 # to record some interaction
-# record(scene, "images\\Interaction2D.gif") do io
-#      for i = 1:200
-#          sleep(0.1)     
-#          recordframe!(io) # record a new frame
-#      end
-#  end
+ record(scene, "images\\Interaction2D.gif") do io
+      for i = 1:200
+          sleep(0.1)     
+          recordframe!(io) # record a new frame
+      end
+  end
 
 
 # Note: interactive figure crash in February because no precip data in february. Easy fix. 
