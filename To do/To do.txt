@@ -19,14 +19,9 @@
 Eventually, I will make a package of this interactive figure (almost a GUI), so that it can work with different datasets (e.g. at other locations, with more or less sensors...) 
 --> If we deploy the same experimental design with different resolutions at ARM sites for example
 
-Also, I will make this interactive figure freely accessible on a website. These will be one of the option of the platform for heterogeneity 
+Also, I will make this interactive figure freely accessible on a website (using Franklin.jl). These will be one of the option of the platform for heterogeneity 
 --> and many others could be done, using different datasets / database of land-atmosphere exchanges
 
 Note that here, we have a dataset of soil respiration, soil moisture, soil temperature. But the same idea (vizualisation, modelisation, bench-marking of heterogeneity grid dataset)
  could be applied to any other land-atmosphere exchange dataset (methane, h2o, others...)  
- 
- 
- 
- Go to Belgium ambassy website, look for info for declaring J1 taxes, if no info on website, call the ambassy
- 
  
