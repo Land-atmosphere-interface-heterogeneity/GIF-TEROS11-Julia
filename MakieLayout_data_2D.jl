@@ -125,7 +125,7 @@ ax[4] = layout[4, 1:2] = LAxis(scene, xticklabelsvisible = false, xticksvisible 
 lRs = lines!(ax[4], Data.Dtime_all_rata[1:end], Rsoil_daily_mean[1:end], color = :green);
 bRs = band!(ax[4], Data.Dtime_all_rata[1:end], Rsoil_daily_mean[1:end] + Rsoil_daily_std[1:end], Rsoil_daily_mean[1:end] - Rsoil_daily_std[1:end], color = RGBAf0(0,1,0,0.3));
 xlims!(ax[4], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[4], (0.25, 3));
-yearm = [2020, 2020, 2020, 2020, 2020, 2020, 2020, 2020]; monthm = [04, 05, 05, 06, 06, 06, 07, 07]; daym = [20, 06, 18, 01, 08, 23, 08, 23];
+yearm = [2020, 2020, 2020, 2020, 2020, 2020, 2020, 2020, 2020]; monthm = [04, 05, 05, 06, 06, 06, 07, 07, 08]; daym = [20, 06, 18, 01, 08, 23, 08, 23, 11];
 dates_manual = datetime2rata.(Date.(yearm, monthm, daym));
 dates_auto = datetime2rata.(Data.Date_Auto);
 sRm = scatter!(ax[4], dates_manual, Data.RSMmean, marker = :circle, markersize = 10 * AbstractPlotting.px, color = :black);
@@ -211,12 +211,12 @@ hmap2.colorrange = (Tmin, Tmax);
 hmap3.colorrange = (Rmin, Rmax);
 
 # to record some interaction
- record(scene, "images\\Interaction2D.gif") do io
-      for i = 1:200
-          sleep(0.1)     
-          recordframe!(io) # record a new frame
-      end
-  end
+# record(scene, "images\\Interaction2D.gif") do io
+#      for i = 1:200
+#          sleep(0.1)     
+#          recordframe!(io) # record a new frame
+#      end
+#  end
 
 
 # Note: interactive figure crash in February because no precip data in february. Easy fix. 
