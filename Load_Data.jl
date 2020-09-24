@@ -187,7 +187,7 @@ function loadauto(path::AbstractString)
 	dataRSA = CSV.read(joinpath(path, inputs[1]), dateformat="yyyy-mm-dd HH:MM:SS", missingstring = "missing");
 	RSAmean =  Array{Float64}(undef,0)
 	RSAstd = Array{Float64}(undef,0)
-	Date_Auto = Date(2020,5,26):Day(1):Date(2020,8,26); 
+	Date_Auto = Date(2020,5,26):Day(1):Date(2020,9,10); 
 	m = length(Date_Auto)
 	# Need mean and std for each day, for now
 	[push!(RSAmean, mean(skipmissing(dataRSA.Exp_Flux[findall(x -> x == Date_Auto[j], Date.(dataRSA.Date_IV))]))) for j in 1:m]
