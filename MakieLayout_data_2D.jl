@@ -125,7 +125,7 @@ ax[4] = layout[4, 1:2] = LAxis(scene, xticklabelsvisible = false, xticksvisible 
 lRs = lines!(ax[4], Data.Dtime_all_rata[1:end], Rsoil_daily_mean[1:end], color = :green);
 bRs = band!(ax[4], Data.Dtime_all_rata[1:end], Rsoil_daily_mean[1:end] + Rsoil_daily_std[1:end], Rsoil_daily_mean[1:end] - Rsoil_daily_std[1:end], color = RGBAf0(0,1,0,0.3));
 xlims!(ax[4], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[4], (0.25, 3));
-yearm = [2020, 2020, 2020, 2020, 2020, 2020, 2020, 2020, 2020, 2020, 2020]; monthm = [04, 05, 05, 06, 06, 06, 07, 07, 08, 08, 09]; daym = [20, 06, 18, 01, 08, 23, 08, 23, 11, 26, 10];
+yearm = [2020, 2020, 2020, 2020, 2020, 2020, 2020, 2020, 2020, 2020, 2020, 2020]; monthm = [04, 05, 05, 06, 06, 06, 07, 07, 08, 08, 09, 09]; daym = [20, 06, 18, 01, 08, 23, 08, 23, 11, 26, 10, 22];
 dates_manual = datetime2rata.(Date.(yearm, monthm, daym));
 dates_auto = datetime2rata.(Data.Date_Auto);
 sRm = scatter!(ax[4], dates_manual, Data.RSMmean, marker = :circle, markersize = 10 * AbstractPlotting.px, color = :black);
