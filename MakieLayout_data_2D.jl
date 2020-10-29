@@ -73,6 +73,16 @@ Tsoil_mean = [mean(skipmissing(Data.Tsoil[i,:])) for i = 1:size(Data.Tsoil,1)];
 Tsoil_std = [std(skipmissing(Data.Tsoil[i,:])) for i = 1:size(Data.Tsoil,1)];
 #Rsoil_mean = [mean(skipmissing(Data.SWC[i,:])) for i = 1:size(Data.SWC,1)]
 
+# Replace missing data (in space, e.g. faulty sensor) by spatial average for each day  
+# this is to avoid weird spot in vizualisation when some data is missing
+SWC_daily_fill = replace(Data.SWC_daily, 0.0=>missing);
+Tsoil_daily_fill = replace(Data.Tsoil_daily, 0.0=>missing);
+Rsoil_daily_fill = replace(Rsoil_daily, 0.0=>missing);
+SWC_daily_fill = [replace(SWC_daily_fill[i,:], missing=>mean(skipmissing(SWC_daily_fill[i,:]))) for i = 1:size(Data.SWC_daily,1)]
+Tsoil_daily_fill = [replace(Tsoil_daily_fill[i,:], missing=>mean(skipmissing(Tsoil_daily_fill[i,:]))) for i = 1:size(Data.Tsoil_daily,1)]
+Rsoil_daily_fill = [replace(Rsoil_daily_fill[i,:], missing=>mean(skipmissing(Rsoil_daily_fill[i,:]))) for i = 1:size(Rsoil_daily,1)]
+									 
+
 # Create Scene and 2D axis
 scene = Scene(resolution = (860, 950), camera=campixel!);
 layout = GridLayout(
@@ -173,17 +183,17 @@ ylims!(ax[11], (0.25, 0.6)); xlims!(ax[11], (1, 48));
 cbar = Array{LColorbar}(undef,3);
 
 ax[5] = layout[3, 1] = LAxis(scene, ylabel = "1 Hectar", ylabelpadding = 10, xticklabelsvisible = false, xticksvisible = false, yticklabelsvisible = false, yticksvisible = false);
-hmap1 = heatmap!(ax[5], Data.x, Data.y, lift(X-> Matrix(sparse(Data.x, Data.y, Data.SWC_daily[X,:])), sl.value), colormap = cgrad(:RdYlBu; categorical = true), colorrange = (0.35, 0.48), interpolate = true, show_axis = false);
+hmap1 = heatmap!(ax[5], Data.x, Data.y, lift(X-> Matrix(sparse(Data.x, Data.y, reduce(vcat, SWC_daily_fill[X,:]))), sl.value), colormap = cgrad(:RdYlBu; categorical = true), colorrange = (0.35, 0.48), interpolate = true, show_axis = false);
 xlims!(ax[5], (1,8)); ylims!(ax[5], (1,8));
 cbar[1] = layout[2, 1] = LColorbar(scene, height = 20, limits = (0.35, 0.48), label = to_latex("\\theta (m^3 m^{-3})"), colormap = cgrad(:RdYlBu; categorical = true), vertical = false, labelpadding = -5, ticklabelalign = (:center, :center), ticklabelpad = 15);
 
 ax[6] = layout[3, 2] = LAxis(scene, yticksvisible = false, yticklabelsvisible = false, xticklabelsvisible = false, xticksvisible = false);
-hmap2 = heatmap!(ax[6], Data.x, Data.y, lift(X-> Matrix(sparse(Data.x, Data.y, Data.Tsoil_daily[X,:])), sl.value), colormap = reverse(cgrad(:RdYlBu; categorical = true)), colorrange = (0, 25), show_axis = false, interpolate = true);
+hmap2 = heatmap!(ax[6], Data.x, Data.y, lift(X-> Matrix(sparse(Data.x, Data.y, reduce(vcat,Tsoil_daily_fill[X,:]))), sl.value), colormap = reverse(cgrad(:RdYlBu; categorical = true)), colorrange = (0, 25), show_axis = false, interpolate = true);
 xlims!(ax[6], (1,8)); ylims!(ax[6], (1,8));
 cbar[2] = layout[2, 2] = LColorbar(scene, height = 20, limits = (0, 25), label = to_latex("T_{soil} (°C)"), colormap = reverse(cgrad(:RdYlBu; categorical = true)), vertical = false, labelpadding = -5, ticklabelalign = (:center, :center), ticklabelpad = 15);
 
 ax[7] = layout[3, 3] = LAxis(scene, yticksvisible = false,  yticklabelsvisible = false, xticklabelsvisible = false, xticksvisible = false);
-hmap3 = heatmap!(ax[7], Data.x, Data.y, lift(X-> Matrix(sparse(Data.x, Data.y, Rsoil_daily[X,:])), sl.value), colormap = reverse(cgrad(:RdYlBu; categorical = true)), colorrange = (0, 10), show_axis = false, interpolate = true);
+hmap3 = heatmap!(ax[7], Data.x, Data.y, lift(X-> Matrix(sparse(Data.x, Data.y, reduce(vcat, Rsoil_daily_fill[X,:]))), sl.value), colormap = reverse(cgrad(:RdYlBu; categorical = true)), colorrange = (0, 10), show_axis = false, interpolate = true);
 xlims!(ax[7], (1,8)); ylims!(ax[7], (1,8));
 cbar[3] = layout[2, 3] = LColorbar(scene, height = 20, limits = (0, 10), label = to_latex("R_{soil} (\\mumol m^{-2} s^{-1})"), colormap = reverse(cgrad(:RdYlBu; categorical = true)), vertical = false, labelpadding = -5, ticklabelalign = (:center, :center), ticklabelpad = 15);
 
