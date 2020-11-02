@@ -21,7 +21,7 @@ end
 # Fixed parameters, values as in John Drake et al., 2018
 R = 8.314472e-3 # Universal gas constant, kJ K-1 mol-1
 O2airfrac = 0.209 # volume of O2 in the air, L L-1
-BD = 1.5396 # Soil bulk density, g cm-3  
+BD = 1.28 # Soil bulk density, g cm-3  
 PD = 2.52 # Soil particle density, g cm-3
 porosity = 1-BD/PD # total porosity 
 psx = 2.4e-2 # Fraction of soil C that is considered soluble
@@ -75,8 +75,8 @@ Data = loaddata();
 
 # Modeled Rsoil
 n_all = size(Data.SWC_daily, 1); # Below are random data, for now
-PD = 3.1; porosity = 1-BD/PD # Avoid complexe number problem DAMM
-Rsoil_daily = [DAMM.(Data.Tsoil_daily[i,:], Data.SWC_daily[i,:], EaSx = 58.00) for i = 1:n_all];
+#PD = 3.1; porosity = 1-BD/PD # Avoid complexe number problem DAMM
+Rsoil_daily = [DAMM.(Data.Tsoil_daily[i,:], Data.SWC_daily[i,:], AlphaSx = 1e8*6.5186e6, EaSx = 97.65, kMSx = 1e-8*184.5, kMO2 = 0.0) for i = 1:n_all];
 Rsoil_daily = reduce(vcat, adjoint.(Rsoil_daily));
 Rsoil_daily_mean = [mean(filter(x -> x > 0, Rsoil_daily[i,:])) for i = 1:n_all];
 Rsoil_daily_std = [std(filter(x -> x > 0, Rsoil_daily[i,:])) for i = 1:n_all];
@@ -85,7 +85,7 @@ Rsoil_daily_std = [std(filter(x -> x > 0, Rsoil_daily[i,:])) for i = 1:n_all];
 SWC  = replace(Data.SWC , missing=>0.0); 
 Tsoil  = replace(Data.Tsoil , missing=>0.0); 
 n = size(Data.Dtime, 1);
-Rsoil_HH = [DAMM.(Tsoil[i,:], SWC[i,:], EaSx = 58.00) for i = 1:n];
+Rsoil_HH = [DAMM.(Tsoil[i,:], SWC[i,:], AlphaSx = 1e8*6.5186e6, EaSx = 97.65, kMSx = 1e-8*184.5, kMO2 = 0.0) for i = 1:n];
 Rsoil_HH = reduce(vcat, adjoint.(Rsoil_HH));
 Rsoil_HH_mean = [mean(filter(x -> x > 0, Rsoil_HH[i,:])) for i = 1:n];
 Rsoil_HH_std = [std(filter(x -> x > 0, Rsoil_HH[i,:])) for i = 1:n];
@@ -227,7 +227,7 @@ function create_plot(sl)
 	scene
 
 	# Limits
-	SWCmin, SWCmax = 0.1, 0.55; Tmin, Tmax = 0, 25; Rmin, Rmax = 0, 20; Pmin, Pmax = 0, 60;
+	SWCmin, SWCmax = 0.1, 0.55; Tmin, Tmax = 0, 25; Rmin, Rmax = 0, 12; Pmin, Pmax = 0, 60;
 
 	xlims!(ax[1], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[1], (Pmin, Pmax));
 	xlims!(ax[2], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[2], (SWCmin, SWCmax));

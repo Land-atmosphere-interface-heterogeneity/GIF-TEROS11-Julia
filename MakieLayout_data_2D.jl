@@ -51,8 +51,8 @@ Data = loaddata();
 
 # Modeled Rsoil
 n_all = size(Data.SWC_daily, 1); # Below are random data, for now
-PD = 3.1; porosity = 1-BD/PD # Avoid complexe number problem DAMM
-Rsoil_daily = [DAMM.(Data.Tsoil_daily[i,:], Data.SWC_daily[i,:], EaSx = 58.00) for i = 1:n_all];
+#PD = 3.1; porosity = 1-BD/PD # Avoid complexe number problem DAMM
+Rsoil_daily = [DAMM.(Data.Tsoil_daily[i,:], Data.SWC_daily[i,:], AlphaSx = 1e8*6.5186e6, EaSx = 97.65, kMSx = 1e-8*184.5, kMO2 = 0.0) for i = 1:n_all];
 Rsoil_daily = reduce(vcat, adjoint.(Rsoil_daily));
 Rsoil_daily_mean = [mean(filter(x -> x > 0, Rsoil_daily[i,:])) for i = 1:n_all];
 Rsoil_daily_std = [std(filter(x -> x > 0, Rsoil_daily[i,:])) for i = 1:n_all];
@@ -61,7 +61,7 @@ Rsoil_daily_std = [std(filter(x -> x > 0, Rsoil_daily[i,:])) for i = 1:n_all];
 SWC  = replace(Data.SWC , missing=>0.0); 
 Tsoil  = replace(Data.Tsoil , missing=>0.0); 
 n = size(Data.Dtime, 1);
-Rsoil_HH = [DAMM.(Tsoil[i,:], SWC[i,:], EaSx = 58.00) for i = 1:n];
+Rsoil_HH = [DAMM.(Tsoil[i,:], SWC[i,:], AlphaSx = 1e8*6.5186e6, EaSx = 97.65, kMSx = 1e-8*184.5, kMO2 = 0.0) for i = 1:n];
 Rsoil_HH = reduce(vcat, adjoint.(Rsoil_HH));
 Rsoil_HH_mean = [mean(filter(x -> x > 0, Rsoil_HH[i,:])) for i = 1:n];
 Rsoil_HH_std = [std(filter(x -> x > 0, Rsoil_HH[i,:])) for i = 1:n];
@@ -204,7 +204,7 @@ scatter!(ax[7], Data.x, Data.y, color = :black, markersize = 2);
 scene
 
 # Limits
-SWCmin, SWCmax = 0.1, 0.55; Tmin, Tmax = 0, 25; Rmin, Rmax = 0, 20; Pmin, Pmax = 0, 60;
+SWCmin, SWCmax = 0.1, 0.55; Tmin, Tmax = 0, 25; Rmin, Rmax = 0, 12; Pmin, Pmax = 0, 60;
 
 xlims!(ax[1], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[1], (Pmin, Pmax));
 xlims!(ax[2], (Data.Dtime_all_rata[1], Data.Dtime_all_rata[end])); ylims!(ax[2], (SWCmin, SWCmax));
@@ -234,5 +234,18 @@ hmap3.colorrange = (Rmin, Rmax);
 
 
 # Note: interactive figure crash in February because no precip data in february. Easy fix. 
+
+
+# Write RSMmean.csv file
+# df = DataFrame()
+# df.Date = Date.(yearm, monthm, daym)
+# df.RSM = Data.RSMmean
+# these = [findfirst(x -> x == Date.(yearm, monthm, daym)[i], Data.Dtime_all) for i = 1:size(Data.RSMmean,1)]
+# df.SWC = Data.SWC_daily_mean[these]
+# df.Tsoil = Data.Tsoil_daily_mean[these]
+# CSV.write("RSMmean.csv", df)
+
+
+
 
 
