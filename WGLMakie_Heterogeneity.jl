@@ -205,22 +205,22 @@ function create_plot(sl)
 
 	cbar = Array{LColorbar}(undef,3);
 
-	ax[5] = layout[3, 1] = LAxis(scene, ylabel = "1 Hectar", ylabelpadding = 10, xticklabelsvisible = false, xticksvisible = false, yticklabelsvisible = false, yticksvisible = false);
+	ax[5] = layout[3, 1] = LAxis(scene, ylabel = "1 Hectare", ylabelpadding = 10, xticklabelsvisible = false, xticksvisible = false, yticklabelsvisible = false, yticksvisible = false);
 	hmap1 = heatmap!(ax[5], Data.x, Data.y, lift(X-> Matrix(sparse(Data.x, Data.y, reduce(vcat, SWC_daily_fill[X,:]))), sl.value), colormap = cgrad(:BuGn; categorical = true), colorrange = (0.35, 0.48), interpolate = true, show_axis = false);
 	xlims!(ax[5], (1,8)); ylims!(ax[5], (1,8));
 	cbar[1] = layout[2, 1] = LColorbar(scene, height = 20, limits = (0.35, 0.48), label = to_latex("\\theta (m^3 m^{-3})"), colormap = cgrad(:BuGn; categorical = true), vertical = false, labelpadding = -5, ticklabelalign = (:center, :center), ticklabelpad = 15);
 	scatter!(ax[5], Data.x, Data.y, color = :black, markersize = 2);
 
 	ax[6] = layout[3, 2] = LAxis(scene, yticksvisible = false, yticklabelsvisible = false, xticklabelsvisible = false, xticksvisible = false);
-	hmap2 = heatmap!(ax[6], Data.x, Data.y, lift(X-> Matrix(sparse(Data.x, Data.y, reduce(vcat,Tsoil_daily_fill[X,:]))), sl.value), colormap = reverse(cgrad(:BuGn; categorical = true)), colorrange = (0, 25), show_axis = false, interpolate = true);
+	hmap2 = heatmap!(ax[6], Data.x, Data.y, lift(X-> Matrix(sparse(Data.x, Data.y, reduce(vcat,Tsoil_daily_fill[X,:]))), sl.value), colormap = cgrad(:BuGn; categorical = true), colorrange = (0, 25), show_axis = false, interpolate = true);
 	xlims!(ax[6], (1,8)); ylims!(ax[6], (1,8));
-	cbar[2] = layout[2, 2] = LColorbar(scene, height = 20, limits = (0, 25), label = to_latex("T_{soil} (°C)"), colormap = reverse(cgrad(:BuGn; categorical = true)), vertical = false, labelpadding = -5, ticklabelalign = (:center, :center), ticklabelpad = 15);
+	cbar[2] = layout[2, 2] = LColorbar(scene, height = 20, limits = (0, 25), label = to_latex("T_{soil} (°C)"), colormap = cgrad(:BuGn; categorical = true), vertical = false, labelpadding = -5, ticklabelalign = (:center, :center), ticklabelpad = 15);
 	scatter!(ax[6], Data.x, Data.y, color = :black, markersize = 2);
 
 	ax[7] = layout[3, 3] = LAxis(scene, yticksvisible = false,  yticklabelsvisible = false, xticklabelsvisible = false, xticksvisible = false);
-	hmap3 = heatmap!(ax[7], Data.x, Data.y, lift(X-> Matrix(sparse(Data.x, Data.y, reduce(vcat, Rsoil_daily_fill[X,:]))), sl.value), colormap = reverse(cgrad(:BuGn; categorical = true)), colorrange = (0, 10), show_axis = false, interpolate = true);
+	hmap3 = heatmap!(ax[7], Data.x, Data.y, lift(X-> Matrix(sparse(Data.x, Data.y, reduce(vcat, Rsoil_daily_fill[X,:]))), sl.value), colormap = cgrad(:BuGn; categorical = true), colorrange = (0, 10), show_axis = false, interpolate = true);
 	xlims!(ax[7], (1,8)); ylims!(ax[7], (1,8));
-	cbar[3] = layout[2, 3] = LColorbar(scene, height = 20, limits = (0, 10), label = to_latex("R_{soil} (\\mumol m^{-2} s^{-1})"), colormap = reverse(cgrad(:BuGn; categorical = true)), vertical = false, labelpadding = -5, ticklabelalign = (:center, :center), ticklabelpad = 15);
+	cbar[3] = layout[2, 3] = LColorbar(scene, height = 20, limits = (0, 10), label = to_latex("R_{soil} (\\mumol m^{-2} s^{-1})"), colormap = cgrad(:BuGn; categorical = true), vertical = false, labelpadding = -5, ticklabelalign = (:center, :center), ticklabelpad = 15);
 	scatter!(ax[7], Data.x, Data.y, color = :black, markersize = 2);
 
 
@@ -250,7 +250,7 @@ function create_plot(sl)
 end
 
 function handler(s, r)
-    sl = JSServe.Slider(1:280)
+    sl = JSServe.Slider(1:335)
     scene = create_plot(sl)
     sldisp = DOM.div(sl, style="width: $(size(scene)[2] -250)px")
     return DOM.div(JSServe.Asset(JSServe.dependency_path("styled.css")), sldisp, scene, style = """
