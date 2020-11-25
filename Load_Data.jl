@@ -8,7 +8,7 @@ function loadteros(path::AbstractString)
 	permute!(Input_FN,[3,4,5,6,7,8,9,10,11,1,2]) # need to reorder from 1 to 11
 	n = length(Input_FN) # this is the number of input files, useful later
 	data = DataFrame[]
-	[push!(data, CSV.read(joinpath(path, Input_FN[i]), dateformat="yyyy-mm-dd HH:MM:SS+00:00")) for i in 1:n]
+	[push!(data, CSV.read(joinpath(path, Input_FN[i]), DataFrame, dateformat="yyyy-mm-dd HH:MM:SS+00:00")) for i in 1:n]
 	return data
 end;
 # Download and load met data
@@ -17,14 +17,14 @@ function loadmet(path::AbstractString)
         [download("http://www.atmos.anl.gov/ANLMET/numeric/2020/"*i*"20met.data", joinpath(path, i*"20met.data")) for i in ["jan", "feb","mar","apr","may","jun","jul","aug","sep","oct"]];
 	col_name = [:DOM,:Month,:Year,:Time,:PSC,:WD60,:WS60,:WD_STD60,:T60,:WD10,:WS10,:WD_STD10,:T10,:DPT,:RH,:TD100,:Precip,:RS,:RN,:Pressure,:WatVapPress,:TS10,:TS100,:TS10F]
 	metdata = DataFrame[]
-	[push!(metdata, CSV.read(joinpath(path, i*"19met.data"), delim=' ', header=col_name, ignorerepeated=true, datarow=1, footerskip=2)) for i in ["nov", "dec"]]
-	[push!(metdata, CSV.read(joinpath(path, i*"20met.data"), delim=' ', header=col_name, ignorerepeated=true, datarow=1, footerskip=2)) for i in ["jan", "feb","mar","apr","may","jun","jul","aug","sep","oct"]]
+	[push!(metdata, CSV.read(joinpath(path, i*"19met.data"), DataFrame, delim=' ', header=col_name, ignorerepeated=true, datarow=1, footerskip=2)) for i in ["nov", "dec"]]
+	[push!(metdata, CSV.read(joinpath(path, i*"20met.data"), DataFrame, delim=' ', header=col_name, ignorerepeated=true, datarow=1, footerskip=2)) for i in ["jan", "feb","mar","apr","may","jun","jul","aug","sep","oct"]]
 	metdata = reduce(vcat, metdata)
 	return metdata
 end;
 # Load metadata (position of TEROS sensors)
 function loadmeta(path::AbstractString)
-	MD = CSV.read(path)
+	MD = CSV.read(path, DataFrame)
 	x = MD.x*12.5
 	y = MD.y*12.5
 	x = x[1:end .!= 35]; x = x[1:end .!= 35]
@@ -190,7 +190,7 @@ function loadmanuals(path::AbstractString)
 	inputs = readdir(path)
 	n = length(inputs)
 	dataRSM = DataFrame[]
-	[push!(dataRSM, CSV.read(joinpath(path, inputs[i]), dateformat="yyyy-mm-dd HH:MM:SS", missingstring = "missing")) for i in 1:n]
+	[push!(dataRSM, CSV.read(joinpath(path, inputs[i]), DataFrame, dateformat="yyyy-mm-dd HH:MM:SS", missingstring = "missing")) for i in 1:n]
 	RSMmean =  Array{Float64}(undef,0)
 	RSMstd = Array{Float64}(undef,0)
 	[push!(RSMmean, mean(skipmissing(dataRSM[i].Exp_Flux))) for i = 1:n]
@@ -199,7 +199,7 @@ function loadmanuals(path::AbstractString)
 end;
 function loadauto(path::AbstractString)
 	inputs = readdir(path)
-	dataRSA = CSV.read(joinpath(path, inputs[1]), dateformat="yyyy-mm-dd HH:MM:SS", missingstring = "missing");
+	dataRSA = CSV.read(joinpath(path, inputs[1]), DataFrame, dateformat="yyyy-mm-dd HH:MM:SS", missingstring = "missing");
 	RSAmean =  Array{Float64}(undef,0)
 	RSAstd = Array{Float64}(undef,0)
 	Date_Auto = Date(2020,5,26):Day(1):Date(2020,10,13); 

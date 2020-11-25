@@ -11,9 +11,9 @@ include("DAMM.jl");
 include("DAMM_param.jl");
 function loaddata()
 	# Load raw data, functions below can be found in Load_Data.jl
-	data = loadteros("Input\\TEROS\\")
-	metdata = loadmet("Input\\MET TOWER\\")
-	x, y = loadmeta("Input\\Metadata.csv")
+	data = loadteros(joinpath("Input","TEROS", ""))
+	metdata = loadmet(joinpath("Input","MET TOWER", ""))
+	x, y = loadmeta(joinpath("Input","Metadata.csv"))
 	Dtime = collect(Dates.DateTime(DateTime(2019, 11, 23, 00, 00, 00)):Dates.Minute(30):now())
 	SWC = loadSWC(data, Dtime)
 	Tsoil = loadTsoil(data, Dtime)
@@ -23,8 +23,8 @@ function loaddata()
 	Tsoil_daily, Tsoil_daily_mean, Tsoil_daily_std = dailyval(Tsoil, Dtime_all)
 	SWC_daily, SWC_daily_mean, SWC_daily_std = dailyval(SWC, Dtime_all)
 	Precip_daily = Precipdaily(Precip_d, Dtime_all, Dtime_met_d)
-	dataRSM, RSMmean, RSMstd = loadmanuals("Input\\SFP output\\Manual")
-	dataRSA, RSAmean, RSAstd, Date_Auto = loadauto("Input\\SFP output\\Auto")
+	dataRSM, RSMmean, RSMstd = loadmanuals(joinpath("Input","SFP output","Manual"))
+	dataRSA, RSAmean, RSAstd, Date_Auto = loadauto(joinpath("Input","SFP output","Auto"))
 
 	# Until I figure how to deal with missing data (in Makie.jl)
 	SWC_daily = replace(SWC_daily, missing=>0.0); SWC_daily_mean = replace(SWC_daily_mean, missing=>0.0); SWC_daily_std = replace(SWC_daily_std, missing=>0.0)
