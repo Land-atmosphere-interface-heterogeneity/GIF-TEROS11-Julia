@@ -225,7 +225,7 @@ hmap2.colorrange = (Tmin, Tmax);
 hmap3.colorrange = (Rmin, Rmax);
 
 # to record some interaction
-# record(scene, "images\\Interaction2D.gif") do io
+# record(scene, joinpath("images","Interaction2D.gif")) do io
 #      for i = 1:200
 #          sleep(0.1)     
 #          recordframe!(io) # record a new frame
