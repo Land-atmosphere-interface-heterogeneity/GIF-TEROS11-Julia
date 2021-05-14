@@ -14,11 +14,11 @@ end;
 # Download and load met data
 function loadmet(path::AbstractString)
         [download("http://www.atmos.anl.gov/ANLMET/numeric/2019/"*i*"19met.data", joinpath(path, i*"19met.data")) for i in ["nov", "dec"]];
-        [download("http://www.atmos.anl.gov/ANLMET/numeric/2020/"*i*"20met.data", joinpath(path, i*"20met.data")) for i in ["jan", "feb","mar","apr","may","jun","jul","aug","sep","oct"]];
+        [download("http://www.atmos.anl.gov/ANLMET/numeric/2020/"*i*"20met.data", joinpath(path, i*"20met.data")) for i in ["jan", "feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"]];
 	col_name = [:DOM,:Month,:Year,:Time,:PSC,:WD60,:WS60,:WD_STD60,:T60,:WD10,:WS10,:WD_STD10,:T10,:DPT,:RH,:TD100,:Precip,:RS,:RN,:Pressure,:WatVapPress,:TS10,:TS100,:TS10F]
 	metdata = DataFrame[]
 	[push!(metdata, CSV.read(joinpath(path, i*"19met.data"), DataFrame, delim=' ', header=col_name, ignorerepeated=true, datarow=1, footerskip=2)) for i in ["nov", "dec"]]
-	[push!(metdata, CSV.read(joinpath(path, i*"20met.data"), DataFrame, delim=' ', header=col_name, ignorerepeated=true, datarow=1, footerskip=2)) for i in ["jan", "feb","mar","apr","may","jun","jul","aug","sep","oct"]]
+	[push!(metdata, CSV.read(joinpath(path, i*"20met.data"), DataFrame, delim=' ', header=col_name, ignorerepeated=true, datarow=1, footerskip=2)) for i in ["jan", "feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"]]
 	metdata = reduce(vcat, metdata)
 	return metdata
 end;
@@ -102,8 +102,8 @@ end;
 # Integrate daily Precip
 # I need to redo this... this is not clean. Maybe fixing latest rain on ANLMET website should be done first. 
 function PrecipD(metdata::DataFrame, Dtime_met::Array{DateTime,1})
-	Precip_d = Array{Float64}(undef, 366)
-	Dtime_met_d = Array{DateTime}(undef, 366)
+	Precip_d = Array{Float64}(undef, 427)
+	Dtime_met_d = Array{DateTime}(undef, 427)
 	for i = 1:30
 	    use = findall(x -> Dates.year(x) == 2019 && Dates.day(x) == i && Dates.month(x) == 11, Dtime_met)
 	    Precip_d[i] = sum(metdata.Precip[use])
@@ -163,6 +163,16 @@ function PrecipD(metdata::DataFrame, Dtime_met::Array{DateTime,1})
 	    use = findall(x -> Dates.year(x) == 2020 && Dates.day(x) == i && Dates.month(x) == 10, Dtime_met)
 	    Precip_d[335 + i] = sum(metdata.Precip[use])
 	    Dtime_met_d[335 + i] = Date(DateTime(2020, 10, i)) 	
+	end
+	for i = 1:30
+	    use = findall(x -> Dates.year(x) == 2020 && Dates.day(x) == i && Dates.month(x) == 11, Dtime_met)
+	    Precip_d[366 + i] = sum(metdata.Precip[use])
+	    Dtime_met_d[366 + i] = Date(DateTime(2020, 11, i))
+	end
+	for i = 1:31
+	    use = findall(x -> Dates.year(x) == 2020 && Dates.day(x) == i && Dates.month(x) == 12, Dtime_met)
+	    Precip_d[396 + i] = sum(metdata.Precip[use])
+	    Dtime_met_d[396 + i] = Date(DateTime(2020, 12, i))
 	end
 	return Precip_d, Dtime_met_d
 end;

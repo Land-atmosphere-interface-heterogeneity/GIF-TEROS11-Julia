@@ -53,5 +53,14 @@ df_datetime = DataFrame(datetime = datetime)
 df = leftjoin(df_datetime, df_SWC, on = :datetime)
 df = leftjoin(df, df_Tsoil, on = :datetime)
 
-# Now need to add met (Precip, Ta, RH), rsoilauto and rsoilmanual 
+# Add met data (all of them)
+# Note met data are hourly, so every other column is missing
+df_met = Data.metdata
+insertcols!(df_met, 1, :datetime => Data.Dtime_met)
+
+df = leftjoin(df, df_met, on = :datetime)
+df = sort(df, :datetime)
+
+# Add Automated Rsoil 
+
 
