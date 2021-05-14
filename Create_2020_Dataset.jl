@@ -69,8 +69,65 @@ df_RSA3 = filter(:"Port#" => x -> x == 3, Data.dataRSA)
 df_RSA4 = filter(:"Port#" => x -> x == 4, Data.dataRSA)
 
 dt_RSA1 = floor.(df_RSA1.Date_IV, Dates.Minute(30))
+dt_RSA2 = floor.(df_RSA2.Date_IV, Dates.Minute(30))
+dt_RSA3 = floor.(df_RSA3.Date_IV, Dates.Minute(30))
+dt_RSA4 = floor.(df_RSA4.Date_IV, Dates.Minute(30))
+
+rename!(df_RSA1, string.("RSA_", names(df_RSA1), "_1"))
+rename!(df_RSA2, string.("RSA_", names(df_RSA2), "_2"))
+rename!(df_RSA3, string.("RSA_", names(df_RSA3), "_3"))
+rename!(df_RSA4, string.("RSA_", names(df_RSA4), "_4"))
+
 insertcols!(df_RSA1, 1, :datetime => dt_RSA1)
+insertcols!(df_RSA2, 1, :datetime => dt_RSA2)
+insertcols!(df_RSA3, 1, :datetime => dt_RSA3)
+insertcols!(df_RSA4, 1, :datetime => dt_RSA4)
+
+# delete duplicate times
+unique!(df_RSA1, :datetime)
+unique!(df_RSA2, :datetime)
+unique!(df_RSA3, :datetime)
+unique!(df_RSA4, :datetime)
 
 # now leftjoin, care for duplicate datetime in RSA
+df = leftjoin(df, df_RSA1, on = :datetime)
+df = leftjoin(df, df_RSA2, on = :datetime)
+df = leftjoin(df, df_RSA3, on = :datetime)
+df = leftjoin(df, df_RSA4, on = :datetime)
+sort!(df, :datetime)
+
+# last but not least, add manual Rsoil data (lots of missing half-hours!) 
+# Surveys = Symbol.(string.("Survey_", string.(1:13)))
+[rename!(Data.dataRSM[i], string.("RSM_", names(Data.dataRSM[i]))) for i = 1:13]
+
+dt_RSM = Dict(1:13 .=> [[] for i = 1:13])
+[push!(dt_RSM[i], floor.(Data.dataRSM[i].RSM_Date_IV, Dates.Minute(30))) for i = 1:13]
+
+df_RSM = Dict(1:13 .=> [[] for i = 1:13])
+[push!(df_RSM[i], insertcols!(Data.dataRSM[i], 1, :datetime => dt_RSM[i][1])) for i = 1:13]
+
+# add data from df_RSM[1] ...  
+# RSM_Exp_Flux_00 RSM_Exp_Flux_01 ... RSM_Exp_Flux_77
+# same with CV and R2 ... 
+n = size(df, 1)
+
+coord = DataFrame(CSV.File(joinpath("Input", "surveyorder.txt")))
+
+RSM_Exp_Fluxes = []
+RSM_Exp_CVs = []
+RSM_Exp_R2s = []
+
+[push!(RSM_Exp_Fluxes, Symbol.(string("RSM_Exp_Flux_", string(coord.x[i]), string(coord.y[i])))) for i = 1:64]
+[push!(RSM_Exp_CVs, Symbol.(string("RSM_Exp_CV_", string(coord.x[i]), string(coord.y[i])))) for i = 1:64]
+[push!(RSM_Exp_R2s, Symbol.(string("RSM_Exp_R2_", string(coord.x[i]), string(coord.y[i])))) for i = 1:64]
+
+[insertcols!(df, RSM_Exp_Fluxes[i] => zeros(n)) for i = 1:64]
+[insertcols!(df, RSM_Exp_CVs[i] => zeros(n)) for i = 1:64]
+[insertcols!(df, RSM_Exp_R2s[i] => zeros(n)) for i = 1:64]
+
+
+# Still need to add RSM data
+CSV.write(joinpath("Output","2020_v1.csv"), df)
+
 
 
