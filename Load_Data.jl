@@ -209,7 +209,9 @@ function loadmanuals(path::AbstractString)
 end;
 function loadauto(path::AbstractString)
 	inputs = readdir(path)
-	dataRSA = CSV.read(joinpath(path, inputs[1]), DataFrame, dateformat="yyyy-mm-dd HH:MM:SS", missingstring = "missing");
+	dataRSA = DataFrame(CSV.File(joinpath(path, inputs[1]), dateformat="yyyy-mm-dd HH:MM:SS"))
+	select!(dataRSA, Not(:Column9)) # delete last column of missing 
+	dataRSA = dropmissing(dataRSA) # delete rows that are messed up due to instrument errors
 	RSAmean =  Array{Float64}(undef,0)
 	RSAstd = Array{Float64}(undef,0)
 	Date_Auto = Date(2020,5,26):Day(1):Date(2020,11,13); 

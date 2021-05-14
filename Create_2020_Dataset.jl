@@ -59,8 +59,18 @@ df_met = Data.metdata
 insertcols!(df_met, 1, :datetime => Data.Dtime_met)
 
 df = leftjoin(df, df_met, on = :datetime)
-df = sort(df, :datetime)
+sort!(df, :datetime)
 
 # Add Automated Rsoil 
+# create one dataframe per port#
+df_RSA1 = filter(:"Port#" => x -> x == 1, Data.dataRSA)
+df_RSA2 = filter(:"Port#" => x -> x == 2, Data.dataRSA)
+df_RSA3 = filter(:"Port#" => x -> x == 3, Data.dataRSA)
+df_RSA4 = filter(:"Port#" => x -> x == 4, Data.dataRSA)
+
+dt_RSA1 = floor.(df_RSA1.Date_IV, Dates.Minute(30))
+insertcols!(df_RSA1, 1, :datetime => dt_RSA1)
+
+# now leftjoin, care for duplicate datetime in RSA
 
 
