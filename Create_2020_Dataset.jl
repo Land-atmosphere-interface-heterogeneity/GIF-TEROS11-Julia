@@ -89,7 +89,7 @@ unique!(df_RSA2, :datetime)
 unique!(df_RSA3, :datetime)
 unique!(df_RSA4, :datetime)
 
-# now leftjoin, care for duplicate datetime in RSA
+# now leftjoin
 df = leftjoin(df, df_RSA1, on = :datetime)
 df = leftjoin(df, df_RSA2, on = :datetime)
 df = leftjoin(df, df_RSA3, on = :datetime)
@@ -97,7 +97,6 @@ df = leftjoin(df, df_RSA4, on = :datetime)
 sort!(df, :datetime)
 
 # last but not least, add manual Rsoil data (lots of missing half-hours!) 
-# Surveys = Symbol.(string.("Survey_", string.(1:13)))
 [rename!(Data.dataRSM[i], string.("RSM_", names(Data.dataRSM[i]))) for i = 1:13]
 
 dt_RSM = Dict(1:13 .=> [[] for i = 1:13])
@@ -106,27 +105,36 @@ dt_RSM = Dict(1:13 .=> [[] for i = 1:13])
 df_RSM = Dict(1:13 .=> [[] for i = 1:13])
 [push!(df_RSM[i], insertcols!(Data.dataRSM[i], 1, :datetime => dt_RSM[i][1])) for i = 1:13]
 
-# add data from df_RSM[1] ...  
-# RSM_Exp_Flux_00 RSM_Exp_Flux_01 ... RSM_Exp_Flux_77
-# same with CV and R2 ... 
-n = size(df, 1)
-
 coord = DataFrame(CSV.File(joinpath("Input", "surveyorder.txt")))
 
-RSM_Exp_Fluxes = []
-RSM_Exp_CVs = []
-RSM_Exp_R2s = []
+RSM_Coords = [] 
 
-[push!(RSM_Exp_Fluxes, Symbol.(string("RSM_Exp_Flux_", string(coord.x[i]), string(coord.y[i])))) for i = 1:64]
-[push!(RSM_Exp_CVs, Symbol.(string("RSM_Exp_CV_", string(coord.x[i]), string(coord.y[i])))) for i = 1:64]
-[push!(RSM_Exp_R2s, Symbol.(string("RSM_Exp_R2_", string(coord.x[i]), string(coord.y[i])))) for i = 1:64]
+[push!(RSM_Coords, Symbol.(string("RSM_", string(coord.x[i]), string(coord.y[i])))) for i = 1:64]
 
-[insertcols!(df, RSM_Exp_Fluxes[i] => zeros(n)) for i = 1:64]
-[insertcols!(df, RSM_Exp_CVs[i] => zeros(n)) for i = 1:64]
-[insertcols!(df, RSM_Exp_R2s[i] => zeros(n)) for i = 1:64]
+RSM_df = Dict(RSM_Coords .=> [[] for i = 1:64])
+
+[push!(RSM_df[RSM_Coords[j]], Data.dataRSM[i][j, 1:5]) for j = 1:64, i = 1:13]  
+
+# need to convert from DataFrameRow to DataFrame
+RSM_vec = [DataFrame(RSM_df[i]) for i in RSM_Coords]
+RSM_df = Dict(RSM_Coords .=> [[] for i = 1:64])
+[push!(RSM_df[RSM_Coords[j]], RSM_vec[j]) for j in 1:64]
+
+# now, need to append _coord to each column name except datetime
+i = 1
+for D in RSM_Coords
+	rename!(RSM_df[D][1], string.(names(RSM_df[D][1]), "_", string(coord.x[i]), string(coord.y[i])))
+	i += 1
+	rename!(RSM_df[D][1], names(RSM_df[D][1])[1] => :datetime)
+end
+
+# leftjoin for each of the 64 RSM_df
+for D in RSM_Coords
+	df = leftjoin(df, RSM_df[D][1], on = :datetime) 
+end
+sort!(df, :datetime)
 
 
-# Still need to add RSM data
 CSV.write(joinpath("Output","2020_v1.csv"), df)
 
 
